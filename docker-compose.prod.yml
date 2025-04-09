@@ -1,0 +1,13 @@
+services:
+  immich-slideshow-old-devices:
+    image: damarte/immich-slideshow-old-devices:latest
+    container_name: immich-slideshow-old-devices
+    ports:
+      - "8080:80"
+    environment:
+      - IMMICH_URL=${IMMICH_URL} # Required
+      - IMMICH_API_KEY=${IMMICH_API_KEY} # Required
+      - ALBUM_ID=${ALBUM_ID} # Required
+      - CAROUSEL_DURATION=${CAROUSEL_DURATION:-5}
+      - IMAGE_SIZE=${IMAGE_SIZE:-fullsize}
+      - CSS_BACKGROUND_COLOR=${CSS_BACKGROUND_COLOR:-black}
