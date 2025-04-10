@@ -67,7 +67,7 @@ class ImmichApi {
 
         $photos = [];
         foreach ($data['assets'] as $asset) {
-            if (!isset($asset['id'])) {
+            if (!isset($asset['id']) || $asset['isArchived'] || $asset['isTrashed']) {
                 continue;
             }
 
