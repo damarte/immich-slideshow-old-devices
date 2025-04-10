@@ -1,15 +1,36 @@
 <?php
 
+/**
+ * Immich API Client
+ */
 class ImmichApi {
-    private $immich_url;
-    private $api_key;
+    private string $immich_url;
+    private string $api_key;
 
-    public function __construct($immich_url, $api_key) {
+    /**
+     * @param string $immich_url Base URL for Immich API
+     * @param string $api_key API key for authentication
+     */
+    public function __construct(string $immich_url, string $api_key) {
+        if (empty($immich_url) || empty($api_key)) {
+            throw new InvalidArgumentException('Immich URL and API key are required');
+        }
         $this->immich_url = rtrim($immich_url, '/');
         $this->api_key = $api_key;
     }
 
-    public function getAlbumAssets($album_id) {
+    /**
+     * Get album assets
+     * 
+     * @param string $album_id Album ID
+     * @return array List of album assets
+     * @throws Exception If there's an error in the request
+     */
+    public function getAlbumAssets(string $album_id): array {
+        if (empty($album_id)) {
+            throw new InvalidArgumentException('Album ID is required');
+        }
+
         $url = "{$this->immich_url}/api/albums/{$album_id}";
         $ch = curl_init($url);
         
@@ -49,29 +70,64 @@ class ImmichApi {
             if (!isset($asset['id'])) {
                 continue;
             }
-            $photos[] = ['id' => $asset['id']];
+
+            // Determinar la orientación basada en las dimensiones de la imagen
+            $orientation = 'landscape';
+            if (isset($asset['exifInfo']['exifImageHeight']) && isset($asset['exifInfo']['exifImageWidth'])) {
+                if ($asset['exifInfo']['exifImageHeight'] > $asset['exifInfo']['exifImageWidth']) {
+                    $orientation = 'portrait';
+                }
+            }
+
+            $photos[] = [
+                'id' => $asset['id'],
+                'orientation' => $orientation
+            ];
         }
 
         return $photos;
     }
 
-    public function getAsset($asset_id, $size) {
+    /**
+     * Get a specific asset
+     * 
+     * @param string $asset_id Asset ID
+     * @param string $size Thumbnail size
+     * @return array [string $content_type, string $image_data]
+     * @throws Exception If there's an error in the request or conversion
+     */
+    public function getAsset(string $asset_id, string $size): array {
+        if (empty($asset_id) || empty($size)) {
+            throw new InvalidArgumentException('Asset ID and size are required');
+        }
+
+        $sizes = ['thumbnail', 'preview', 'fullsize'];
+
+        if (!in_array($size, $sizes)) {
+            throw new InvalidArgumentException('Size must be one of: ' . implode(', ', $sizes));
+        }
+
         $url = "{$this->immich_url}/api/assets/{$asset_id}/thumbnail?size={$size}";
 
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "x-api-key: {$this->api_key}",
-            "Accept: application/octet-stream"
+        if ($ch === false) {
+            throw new Exception('Could not initialize cURL');
+        }
+
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTPHEADER => [
+                "x-api-key: {$this->api_key}",
+                "Accept: application/octet-stream"
+            ]
         ]);
 
         $image_data = curl_exec($ch);
         if ($image_data === false) {
-            $error = "Error: " . curl_error($ch);
-            error_log($error);
+            $error = curl_error($ch);
             curl_close($ch);
-            throw new Exception($error);
+            throw new Exception("Error cURL: {$error}");
         }
 
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -79,27 +135,33 @@ class ImmichApi {
         curl_close($ch);
 
         if ($http_code !== 200) {
-            $error = "HTTP error $http_code when connecting to Immich: $response";
-            error_log($error);
-            throw new Exception($error);
+            throw new Exception("Error HTTP {$http_code} when connecting to Immich");
         }
 
         if ($content_type === 'image/webp') {
-            // If the content type is webp, convert to jpg for compatibility
+            // If content is webp, convert to jpg for compatibility
             $temp = tmpfile();
-            fwrite($temp, $image_data);
-            $image = imagecreatefromwebp(stream_get_meta_data($temp)['uri']);
-            fclose($temp);
-            if ($image === false) {
-                $error = "Error converting image to JPG";
-                error_log($error);
-                throw new Exception($error);
+            if ($temp === false) {
+                throw new Exception('Could not create temporary file');
             }
-            ob_start();
-            imagejpeg($image);
-            $image_data = ob_get_clean();
-            imagedestroy($image);
-            $content_type = 'image/jpeg';
+
+            try {
+                fwrite($temp, $image_data);
+                $meta = stream_get_meta_data($temp);
+                $image = @imagecreatefromwebp($meta['uri']);
+                
+                if ($image === false) {
+                    throw new Exception('Error converting WebP image');
+                }
+
+                ob_start();
+                imagejpeg($image, null, 85); // Add compression quality
+                $image_data = ob_get_clean();
+                imagedestroy($image);
+                $content_type = 'image/jpeg';
+            } finally {
+                fclose($temp);
+            }
         }
 
         return [$content_type, $image_data];

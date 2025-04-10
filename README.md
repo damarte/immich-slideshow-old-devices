@@ -6,10 +6,15 @@ A simple PHP-based slideshow application for Immich album photos, designed to wo
 
 - Full-screen slideshow of Immich album photos
 - Configurable slide transition time
-- Supports different image sizes (thumbnail, preview, fullsize)
 - Automatic WebP to JPEG conversion for better compatibility
 - Customizable background color
 - Optional random order for photos
+- Configurable status bar style for iOS devices
+- Hardware-accelerated transitions for smooth performance
+- Click/tap on image to view full resolution version
+- Automatic page reload after showing all photos
+- Built-in image caching for better performance
+- Filter images by orientation (landscape/portrait/all)
 
 ## Requirements
 
@@ -37,10 +42,9 @@ IMMICH_URL=http://your-immich-server:2283
 IMMICH_API_KEY=your_api_key
 ALBUM_ID=your_album_id
 CAROUSEL_DURATION=5
-IMAGE_SIZE=fullsize
 CSS_BACKGROUND_COLOR=black
 RANDOM_ORDER=false
-STATUS_BAR_STYLE=default
+STATUS_BAR_STYLE=black-translucent
 ```
 
 ## Usage
@@ -71,10 +75,10 @@ The application will be available at `http://localhost:8080`
 | IMMICH_API_KEY | Your Immich API key | - | Yes |
 | ALBUM_ID | ID of the album to display | - | Yes |
 | CAROUSEL_DURATION | Time in seconds between slides | 5 | No |
-| IMAGE_SIZE | Size of images (thumbnail/preview/fullsize) | fullsize | No |
 | CSS_BACKGROUND_COLOR | Background color of the slideshow | black | No |
 | RANDOM_ORDER | Show photos in random order | false | No |
-| STATUS_BAR_STYLE | Style of the status bar (default/light/dark) | default | No |
+| STATUS_BAR_STYLE | Style of the iOS status bar | black-translucent | No |
+| IMAGES_ORIENTATION | Orientation of the images (landscape/portrait/all) | all | No |
 
 ## Query Parameters
 
@@ -82,14 +86,22 @@ You can override the environment variables using query parameters in the URL:
 
 - `album_id`: Override the ALBUM_ID
 - `duration`: Override the CAROUSEL_DURATION
-- `size`: Override the IMAGE_SIZE
 - `background`: Override the CSS_BACKGROUND_COLOR
 - `random`: Override the RANDOM_ORDER (use 'true' or 'false')
-- `status_bar`: Override the STATUS_BAR_STYLE (use 'default', 'light', or 'dark')
+- `status_bar`: Override the STATUS_BAR_STYLE (use 'default', 'black-translucent', or 'black')
+- `orientation`: Override the IMAGES_ORIENTATION (use 'landscape', 'portrait', or 'all')
 
 Example:
 ```
 http://localhost:8080/?random=true&duration=3
+```
+
+## Docker Hub
+
+The application is available as a Docker image on Docker Hub:
+
+```bash
+docker pull damarte/immich-slideshow-old-devices:latest
 ```
 
 ## License

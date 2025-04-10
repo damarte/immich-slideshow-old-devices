@@ -9,7 +9,7 @@ services:
       - IMMICH_API_KEY=${IMMICH_API_KEY} # Required
       - ALBUM_ID=${ALBUM_ID} # Required
       - CAROUSEL_DURATION=${CAROUSEL_DURATION:-5}
-      - IMAGE_SIZE=${IMAGE_SIZE:-fullsize}
       - CSS_BACKGROUND_COLOR=${CSS_BACKGROUND_COLOR:-black}
       - RANDOM_ORDER=${RANDOM_ORDER:-false}
-      - STATUS_BAR_STYLE=${STATUS_BAR_STYLE:-default}
+      - STATUS_BAR_STYLE=${STATUS_BAR_STYLE:-black-translucent}
+      - IMAGES_ORIENTATION=${IMAGES_ORIENTATION:-all}
