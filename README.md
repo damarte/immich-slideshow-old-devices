@@ -1,6 +1,6 @@
 # Immich Slideshow for Old Devices
 
-A simple PHP-based slideshow application for Immich photo albums, designed to work on older devices and browsers (iOS 9, old Android...). It displays photos from a specified Immich album in a full-screen slideshow format.
+A simple PHP-based slideshow application for Immich album photos, designed to work on older devices and browsers (iOS 9, old Android...). It displays photos from a specified Immich album in a full-screen slideshow format.
 
 ## Features
 
@@ -9,6 +9,7 @@ A simple PHP-based slideshow application for Immich photo albums, designed to wo
 - Supports different image sizes (thumbnail, preview, fullsize)
 - Automatic WebP to JPEG conversion for better compatibility
 - Customizable background color
+- Optional random order for photos
 
 ## Requirements
 
@@ -38,6 +39,8 @@ ALBUM_ID=your_album_id
 CAROUSEL_DURATION=5
 IMAGE_SIZE=fullsize
 CSS_BACKGROUND_COLOR=black
+RANDOM_ORDER=false
+STATUS_BAR_STYLE=default
 ```
 
 ## Usage
@@ -70,6 +73,24 @@ The application will be available at `http://localhost:8080`
 | CAROUSEL_DURATION | Time in seconds between slides | 5 | No |
 | IMAGE_SIZE | Size of images (thumbnail/preview/fullsize) | fullsize | No |
 | CSS_BACKGROUND_COLOR | Background color of the slideshow | black | No |
+| RANDOM_ORDER | Show photos in random order | false | No |
+| STATUS_BAR_STYLE | Style of the status bar (default/light/dark) | default | No |
+
+## Query Parameters
+
+You can override the environment variables using query parameters in the URL:
+
+- `album_id`: Override the ALBUM_ID
+- `duration`: Override the CAROUSEL_DURATION
+- `size`: Override the IMAGE_SIZE
+- `background`: Override the CSS_BACKGROUND_COLOR
+- `random`: Override the RANDOM_ORDER (use 'true' or 'false')
+- `status_bar`: Override the STATUS_BAR_STYLE (use 'default', 'light', or 'dark')
+
+Example:
+```
+http://localhost:8080/?random=true&duration=3
+```
 
 ## License
 

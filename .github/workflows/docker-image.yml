@@ -1,11 +1,12 @@
 name: Docker Image CI
 
 on:
-  push:
-    branches: [ "main" ]
+  release:
+    types: [published]
 
 jobs:
   docker:
+    name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repo
@@ -17,8 +18,15 @@ jobs:
        username: ${{ secrets.DOCKERHUB_USERNAME }}
        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: damarte/immich-slideshow-old-devices
+
     - name: Build and push to dockerhub
       uses: docker/build-push-action@v6
       with:
-       push: true
-       tags: damarte/immich-slideshow-old-devices:latest
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
