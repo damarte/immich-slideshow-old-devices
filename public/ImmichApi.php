@@ -71,7 +71,7 @@ class ImmichApi {
                 continue;
             }
 
-            // Determinar la orientación basada en las dimensiones de la imagen
+            // Determine orientation based on image dimensions
             $orientation = 'landscape';
             if (isset($asset['exifInfo']['exifImageHeight']) && isset($asset['exifInfo']['exifImageWidth'])) {
                 if ($asset['exifInfo']['exifImageHeight'] > $asset['exifInfo']['exifImageWidth']) {

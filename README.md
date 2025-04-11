@@ -1,6 +1,16 @@
-# Immich Slideshow for Old Devices
+# Immich Slideshow for old Devices
 
-A simple PHP-based slideshow application for Immich album photos, designed to work on older devices and browsers (iOS 9, old Android...). It displays photos from a specified Immich album in a full-screen slideshow format.
+A simple PHP-based slideshow application for Immich album photos, designed to work on older devices and browsers (iOS 9, old Android, ECMAScript 2009...). It displays photos from a specified Immich album in a full-screen slideshow format.
+
+One day I decided to dust off two old iPads I had in a drawer (an iPad 2 and an iPad mini) to use them as digital photo frames, so my parents could see their granddaughter's photos from an album of my Immich instance.
+
+I searched for projects already created for this purpose and found the great [Immich Kiosk](https://github.com/damongolding/immich-kiosk), it's a good project but it doesn't work on such old devices, so I decided to create a simple alternative but that works on older browsers and devices.
+
+> [!NOTE]
+> If your device supports [Immich Kiosk](https://github.com/damongolding/immich-kiosk), maybe you should use it before this project.
+
+> [!IMPORTANT]
+> **This project is not affiliated with [Immich][immich-github-url]**
 
 ## Features
 
@@ -10,11 +20,10 @@ A simple PHP-based slideshow application for Immich album photos, designed to wo
 - Customizable background color
 - Optional random order for photos
 - Configurable status bar style for iOS devices
-- Hardware-accelerated transitions for smooth performance
-- Click/tap on image to view full resolution version
 - Automatic page reload after showing all photos
 - Built-in image caching for better performance
 - Filter images by orientation (landscape/portrait/all)
+- Pause/resume slide
 
 ## Requirements
 

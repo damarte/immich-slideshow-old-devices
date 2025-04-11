@@ -1,7 +1,7 @@
-# Imagen base con PHP-FPM
+# Base image with PHP-FPM
 FROM php:8.4-fpm
 
-# Instalar dependencias del sistema y extensiones PHP
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     nginx \
     libfreetype-dev \
@@ -15,26 +15,26 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiar configuración de Nginx y manejar el enlace simbólico
+# Copy Nginx configuration and handle symbolic link
 COPY nginx.conf /etc/nginx/sites-available/default
-# Eliminar el enlace existente si existe y luego crearlo
+# Remove existing link if it exists and then create it
 RUN rm -f /etc/nginx/sites-enabled/default && ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
-# Establecer directorio de trabajo
+# Set working directory
 WORKDIR /var/www/html
 
-# Copiar archivos de la aplicación
+# Copy application files
 COPY public/ .
 
-# Dar permisos al usuario www-data
+# Give permissions to www-data user
 RUN chown -R www-data:www-data /var/www/html
 
-# Exponer puerto 80
+# Expose port 80
 EXPOSE 80
 
-# Copiar script de entrada
+# Copy entry script
 COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Usar el script como punto de entrada
+# Use the script as entry point
 ENTRYPOINT ["entrypoint.sh"]
