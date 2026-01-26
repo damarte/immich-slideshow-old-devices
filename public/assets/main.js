@@ -31,15 +31,6 @@ function initSlideshow(config) {
     // Initial dimensions
     updateScreenDimensions();
     
-    // Listen for arrows
-    document.addEventListener('keydown', function(event) {
-        if (event.key === "ArrowLeft" || event.keyCode === 37) {
-            changeSlide(-1);
-        } else if (event.key === "ArrowRight" || event.keyCode === 39) {
-            changeSlide(1);
-        }
-    });
-
     // Initialize slideshow if there are photos
     if (totalPhotos > 0) {
         // Show first image
@@ -79,9 +70,58 @@ function buildProxyUrl(assetId) {
 /**
  * Loads the next image in the slideshow
  */
-function nextImage() {
-    if (totalPhotos === 0 || isTransitioning || isPaused) return;
+function previousImage() {
+    // 1. Safety check and clear any existing auto-timer
+    if (totalPhotos === 0 || isTransitioning) return;
+    if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
     
+    isTransitioning = true;
+    
+    // 2. FIXED: Correct way to wrap backwards in JavaScript
+    // Adding totalPhotos ensures the result is always positive
+    currentIndex = (currentIndex - 1 + totalPhotos) % totalPhotos;
+
+    // 3. Optional: Logic for reloading
+    // If you want it to reload when hitting the "beginning"
+    if (currentIndex === totalPhotos - 1) { 
+        // This triggers if they press 'Back' at the very first photo
+        // window.location.reload(); 
+        // return;
+    }
+
+    // 4. Update the image source BEFORE swapping
+    // Unlike nextImage, we need the "new" (previous) image ready NOW
+    nextImg.src = buildProxyUrl(photos[currentIndex].id);
+
+    // 5. Swap the CSS classes to trigger the transition
+    currentImg.className = '';
+    nextImg.className = 'active';
+
+    // 6. Swap the DOM references
+    var temp = currentImg;
+    currentImg = nextImg;
+    nextImg = temp;
+
+    // 7. Cleanup and Preload
+    setTimeout(function () {
+        // Preload the "future" next image (the one after the one we just showed)
+        var nextIndex = (currentIndex + 1) % totalPhotos;
+        nextImg.src = buildProxyUrl(photos[nextIndex].id);
+        isTransitioning = false;
+        
+        // 8. Resume the timer so it doesn't get stuck forever
+        scheduleNextTransition();
+    }, 1000);
+}
+
+/**
+ * Loads the next image in the slideshow
+ */
+function nextImage() {
+    if (totalPhotos === 0 || isTransitioning ) return;
+    
+    if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
+
     isTransitioning = true;
     
     // Move to next index
@@ -142,3 +182,6 @@ function togglePause(e) {
 
 // Resize event handler
 window.addEventListener('resize', updateScreenDimensions);
+// This makes the functions visible to index.php
+window.nextImage = nextImage;
+window.previousImage = previousImage;

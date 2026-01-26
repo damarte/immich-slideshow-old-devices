@@ -108,37 +108,73 @@ try {
     </div>
     <img src="/assets/pause.png" alt="Pause icon" class="pause-icon" id="pause-icon"/>
     <script>
-        initSlideshow({
-            photos: <?php echo json_encode($photos); ?>,
-            duration: <?php echo $carousel_duration; ?>
-        });
-    </script>
-    <script>
-        // Store the ID that the page was loaded with
-        const activeAlbumId = "<?php echo $album_id; ?>";
+    // 1. Setup variables
+    var activeAlbumId = "<?php echo $album_id; ?>";
+    
+    // 2. Start the Slideshow
+    initSlideshow({
+        photos: <?php echo json_encode($photos); ?>,
+        duration: <?php echo $carousel_duration; ?>
+    });
 
-        // Every 5 seconds, check if the server-side config has changed
-        setInterval(async () => {
-            try {
-                // Fetch the config file from the server
-                const response = await fetch('config.json', { 
-                    cache: "no-store", // Ensure we don't get a cached version
-                    headers: { 'Cache-Control': 'no-cache' }
-                });
-                
-                if (!response.ok) return;
+    // 3. IR Remote (Keyboard Mode) Listener
+    document.onkeydown = function(e) {
+        e = e || window.event;
+        var keyCode = e.keyCode || e.which;
 
-                const remoteConfig = await response.json();
+        switch(keyCode) {
+            // --- FORWARD (Right Arrow & Down Arrow) ---
+            case 39: // Right Arrow
+            case 40: // Down Arrow
+                if (typeof nextImage === 'function') {
+                    nextImage();
+                }
+                break; // Essential: Stops the script here
 
-                // If the album ID has changed on the server, reload the page
-                if (remoteConfig.album_id && remoteConfig.album_id !== activeAlbumId) {
-                    console.log("Album change detected! Switching to: " + remoteConfig.album_id);
+            // --- BACKWARD (Left Arrow & Up Arrow) ---
+            case 37: // Left Arrow
+            case 38: // Up Arrow
+                if (typeof previousImage === 'function') {
+                    previousImage();
+                } else {
+                    // If previousImage isn't ready, reload acts as a reset
                     window.location.reload();
                 }
-            } catch (e) {
-                console.error("Background config check failed", e);
+                break;
+
+            // --- CENTER (Enter / OK) ---
+            case 13: // Enter
+                if (typeof nextImage === 'function') {
+                    nextImage();
+                }
+                break;
+
+            default:
+                // This ignores any other keys (Volume, Home, etc.)
+                break;
+        }
+    };
+
+    // 4. Server-Side Config Poller
+    function checkConfig() {
+        var xhr = new XMLHttpRequest();
+        var url = 'config.json?t=' + new Date().getTime();
+        
+        xhr.open('GET', url, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                try {
+                    var remoteConfig = JSON.parse(xhr.responseText);
+                    if (remoteConfig.album_id && remoteConfig.album_id !== activeAlbumId) {
+                        window.location.reload();
+                    }
+                } catch (e) {}
             }
-        }, 5000);
-    </script>
+        };
+        xhr.send();
+    }
+
+    setInterval(checkConfig, 10000);
+</script>
 </body>
 </html>
