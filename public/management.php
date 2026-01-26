@@ -30,21 +30,26 @@ $message = "";
 // --- 3. CONFIG SAVE LOGIC (REVISED) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'update') {
-        // Grab the array of IDs from the checkboxes
+        
         $selected_albums = $_POST['album_ids'] ?? [];
 
-        $new_settings = [
-            'album_ids'   => $selected_albums, // This is now an array
-            'duration'    => (int)$_POST['duration'],
-            'random'      => ($_POST['random'] === 'true'),
-            'orientation' => $_POST['orientation'],
-            'updated_at'  => time() 
-        ];
-
-        if (file_put_contents($config_file, json_encode($new_settings, JSON_PRETTY_PRINT))) {
-            $message = "Success! Settings saved for " . count($selected_albums) . " albums.";
+        // --- NEW SAFETY CHECK ---
+        if (empty($selected_albums)) {
+            $message = "Error: You must select at least one album.";
         } else {
-            $message = "Error: Could not write to config.json.";
+            $new_settings = [
+                'album_ids'   => $selected_albums,
+                'duration'    => (int)$_POST['duration'],
+                'random'      => ($_POST['random'] === 'true'),
+                'orientation' => $_POST['orientation'],
+                'updated_at'  => time() 
+            ];
+
+            if (file_put_contents($config_file, json_encode($new_settings, JSON_PRETTY_PRINT))) {
+                $message = "Success! Settings saved.";
+            } else {
+                $message = "Error: Could not write to config.json.";
+            }
         }
     }
 }
@@ -97,7 +102,7 @@ $current = file_exists($config_file) ? json_decode(file_get_contents($config_fil
     <h1>Select Album</h1>
     
     <?php if ($message): ?>
-        <div class="alert <?= (strpos($message, 'Error') !== false) ? 'alert-error' : 'alert-success' ?>">
+        <div id="status-message" class="alert <?= (strpos($message, 'Error') !== false) ? 'alert-error' : 'alert-success' ?>">
             <?= htmlspecialchars($message) ?>
         </div>
     <?php endif; ?>
@@ -145,10 +150,36 @@ $current = file_exists($config_file) ? json_decode(file_get_contents($config_fil
                 </div>
             </div>
             <div class="flex">
-                <button type="submit" name="action" value="update" class="btn-update">SAVE SETTINGS</button>
+                <button type="submit" name="action" value="update" class="btn-update" onclick="return validateSelection()">SAVE SETTINGS</button>
             </div>
         </div>
     </form>
 </div>
+<script>
+    function validateSelection() {
+    const checkedCount = document.querySelectorAll('.album-checkbox:checked').length;
+    if (checkedCount === 0) {
+        alert("Please select at least one album before saving!");
+        return false; // Prevents the form from submitting
+    }
+    return true;
+    }
+    // Wait for the page to load
+    window.addEventListener('load', function() {
+        const message = document.getElementById('status-message');
+        if (message) {
+            // Wait 3 seconds, then start fading
+            setTimeout(() => {
+                message.style.transition = "opacity 1s ease";
+                message.style.opacity = "0";
+                
+                // Fully remove it from the layout after the fade
+                setTimeout(() => {
+                    message.style.display = "none";
+                }, 1000); 
+            }, 3000); // 3000ms = 3 seconds
+        }
+    });
+</script>
 </body>
 </html>
