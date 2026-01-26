@@ -12,28 +12,28 @@ require_once './ImmichApi.php';
 $config_file = 'config.json';
 $current_settings = json_decode(file_get_contents($config_file), true);
 
-// Use the saved settings if they exist, otherwise fall back to environment defaults
-$album_id = $current_settings['album_id'] ?? getenv('ALBUM_ID');
-$carousel_duration = (int)($current_settings['duration'] ?? getenv('CAROUSEL_DURATION') ?? 5);
-
-
 // Configuration parameters with validation
 $immich_url = getenv('IMMICH_URL');
 $immich_api_key = getenv('IMMICH_API_KEY');
 
 // Get and validate input parameters with defaults
-$album_id = $_GET['album_id'] ?? getenv('ALBUM_ID');
-$carousel_duration = (int)($_GET['duration'] ?? getenv('CAROUSEL_DURATION') ?? 5);
+$album_id = $current_settings['album_id'] ?? $_GET['album_id'] ?? getenv('ALBUM_ID');
+
+$carousel_duration = (int)($current_settings['duration'] ?? $_GET['duration'] ?? getenv('CAROUSEL_DURATION') ?? 5);
+
 $background = preg_match('/^[a-zA-Z0-9#]+$/', $_GET['background'] ?? '') 
     ? $_GET['background'] 
     : (getenv('CSS_BACKGROUND_COLOR') ?? 'black');
-$random_order = filter_var($_GET['random'] ?? getenv('RANDOM_ORDER') ?? 'false', FILTER_VALIDATE_BOOLEAN);
+
+$random_order = filter_var($current_settings['random'] ?? $_GET['random'] ?? getenv('RANDOM_ORDER') ?? 'false', FILTER_VALIDATE_BOOLEAN);
+
 $status_bar_style = in_array($_GET['status_bar'] ?? '', ['default', 'black-translucent', 'black']) 
     ? $_GET['status_bar'] 
     : (getenv('STATUS_BAR_STYLE') ?? 'black-translucent');
+
 $orientation = in_array($_GET['orientation'] ?? '', ['landscape', 'portrait', 'all']) 
     ? $_GET['orientation'] 
-    : (getenv('IMAGES_ORIENTATION') ?? 'all');
+    : ($current_settings['orientation'] ?? getenv('IMAGES_ORIENTATION') ?? 'all');
 
 // Validate required parameters
 if (!$album_id) {
@@ -112,6 +112,33 @@ try {
             photos: <?php echo json_encode($photos); ?>,
             duration: <?php echo $carousel_duration; ?>
         });
+    </script>
+    <script>
+        // Store the ID that the page was loaded with
+        const activeAlbumId = "<?php echo $album_id; ?>";
+
+        // Every 5 seconds, check if the server-side config has changed
+        setInterval(async () => {
+            try {
+                // Fetch the config file from the server
+                const response = await fetch('config.json', { 
+                    cache: "no-store", // Ensure we don't get a cached version
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+                
+                if (!response.ok) return;
+
+                const remoteConfig = await response.json();
+
+                // If the album ID has changed on the server, reload the page
+                if (remoteConfig.album_id && remoteConfig.album_id !== activeAlbumId) {
+                    console.log("Album change detected! Switching to: " + remoteConfig.album_id);
+                    window.location.reload();
+                }
+            } catch (e) {
+                console.error("Background config check failed", e);
+            }
+        }, 5000);
     </script>
 </body>
 </html>
