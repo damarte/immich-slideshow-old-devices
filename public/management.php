@@ -82,6 +82,10 @@ $current = file_exists($config_file) ? json_decode(file_get_contents($config_fil
         .btn-update { background: #2196f3; font-weight: bold; border: none; height: 45px; cursor: pointer; }
         label { font-size: 11px; color: #888; text-transform: uppercase; font-weight: bold; }
     </style>
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-icon-180.png"/>
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"/>
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png"/>
 </head>
 <body>
 <div class="container">
