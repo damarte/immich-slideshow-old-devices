@@ -11,4 +11,7 @@
 .history/
 
 # Built Visual Studio Code Extensions
-*.vsix
+*.vsix*
+*.log
+
+config.json

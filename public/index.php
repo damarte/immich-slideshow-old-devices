@@ -8,6 +8,15 @@
 
 require_once './ImmichApi.php';
 
+// Read the server-side state
+$config_file = 'config.json';
+$current_settings = json_decode(file_get_contents($config_file), true);
+
+// Use the saved settings if they exist, otherwise fall back to environment defaults
+$album_id = $current_settings['album_id'] ?? getenv('ALBUM_ID');
+$carousel_duration = (int)($current_settings['duration'] ?? getenv('CAROUSEL_DURATION') ?? 5);
+
+
 // Configuration parameters with validation
 $immich_url = getenv('IMMICH_URL');
 $immich_api_key = getenv('IMMICH_API_KEY');

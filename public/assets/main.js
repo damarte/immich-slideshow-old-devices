@@ -31,6 +31,15 @@ function initSlideshow(config) {
     // Initial dimensions
     updateScreenDimensions();
     
+    // Listen for arrows
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "ArrowLeft" || event.keyCode === 37) {
+            changeSlide(-1);
+        } else if (event.key === "ArrowRight" || event.keyCode === 39) {
+            changeSlide(1);
+        }
+    });
+
     // Initialize slideshow if there are photos
     if (totalPhotos > 0) {
         // Show first image
