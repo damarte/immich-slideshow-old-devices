@@ -123,34 +123,34 @@ try {
         var keyCode = e.keyCode || e.which;
 
         switch(keyCode) {
+            // --- REFRESH (Up Arrow) ---
+            case 38: 
+                console.log("Remote: Manual Refresh");
+                window.location.reload();
+                break;
+
             // --- FORWARD (Right Arrow & Down Arrow) ---
             case 39: // Right Arrow
             case 40: // Down Arrow
                 if (typeof nextImage === 'function') {
                     nextImage();
                 }
-                break; // Essential: Stops the script here
+                break;
 
-            // --- BACKWARD (Left Arrow & Up Arrow) ---
+            // --- BACKWARD (Left Arrow) ---
             case 37: // Left Arrow
-            case 38: // Up Arrow
                 if (typeof previousImage === 'function') {
                     previousImage();
                 } else {
-                    // If previousImage isn't ready, reload acts as a reset
                     window.location.reload();
                 }
                 break;
 
             // --- CENTER (Enter / OK) ---
             case 13: // Enter
-                if (typeof nextImage === 'function') {
-                    nextImage();
+                if (typeof togglePause === 'function') {
+                    togglePause();
                 }
-                break;
-
-            default:
-                // This ignores any other keys (Volume, Home, etc.)
                 break;
         }
     };
