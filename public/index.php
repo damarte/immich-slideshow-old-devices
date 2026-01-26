@@ -92,7 +92,7 @@ try {
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"/>
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png"/>
     <link rel="stylesheet" href="/assets/main.css"/>
-    <script src="/assets/main.js"></script>
+    <script src="assets/main.js?v=<?php echo filemtime('assets/main.js'); ?>"></script>
     <style>
         html, body {
             background-color: <?php echo htmlspecialchars($background); ?>;

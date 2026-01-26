@@ -166,7 +166,10 @@ function scheduleNextTransition() {
  * Toggles pause state
  */
 function togglePause(e) {
-    e.preventDefault();
+    // If an event was passed, stop the default action (like scrolling)
+    if (e && typeof e.preventDefault === 'function') {
+        e.preventDefault();
+    }
     isPaused = !isPaused;
     
     if (isPaused) {
