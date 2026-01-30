@@ -1,6 +1,6 @@
 # Immich Slideshow for old Devices with Management UI
 
-I added some stuff to this repo in order to get it working with the Fully Kiosk Browser on a Nixplay w10a. Generally this should work on tablets with android 19 (4.4). The main slideshow is is at the root URL while the management is done at /management.php
+I added some stuff to this repo in order to get it working with the Fully Kiosk Browser on a Nixplay w10a. Generally this should work on tablets with android 19 (4.4). The main slideshow is is at the root URL while the management is done at /management.php. The tablet itself is running fully kiosk's browser, and Tasker to reboot the browser upon reboot/crash.
 
 A simple PHP-based slideshow application for Immich album photos, designed to work on older devices and browsers (iOS 9, old Android, ECMAScript 2009...). It displays photos from a specified Immich album in a full-screen slideshow format.
 
