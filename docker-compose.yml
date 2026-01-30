@@ -10,9 +10,6 @@ services:
       - IMMICH_URL=${IMMICH_URL} # Required
       - IMMICH_API_KEY=${IMMICH_API_KEY} # Required
       - ALBUM_ID=${ALBUM_ID} # Required
-      - TABLET_IP=${TABLET_IP} # Required
-      - KIOSK_PASSWORD=${KIOSK_PASSWORD} # Required
-      - SLIDESHOW_BASE_URL=${SLIDESHOW_BASE_URL} # Required
       - CAROUSEL_DURATION=${CAROUSEL_DURATION:-5}
       - CSS_BACKGROUND_COLOR=${CSS_BACKGROUND_COLOR:-black}
       - RANDOM_ORDER=${RANDOM_ORDER:-false}
