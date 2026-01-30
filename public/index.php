@@ -72,16 +72,20 @@ try {
     exit;
 }
 ?>
-?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui"/>
     <title>Immich Slideshow</title>
-    <link rel="stylesheet" href="/assets/main.css?v=<?php echo filemtime('assets/main.css'); ?>">
+    <link rel="stylesheet" href="/assets/main.css"/>
     <script src="assets/main.js?v=<?php echo filemtime('assets/main.js'); ?>"></script>
     <style>html, body { background-color: <?php echo htmlspecialchars($background); ?>; }</style>
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-icon-180.png"/>
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"/>
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png"/>
 </head>
 <body>
     <div class="carousel">
