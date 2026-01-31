@@ -109,8 +109,9 @@ http://localhost:8080/?random=true&duration=3
 ```
 
 ## Management
-
+```
 http://localhost:8080/management.php
+```
 
 ## Docker 
 
