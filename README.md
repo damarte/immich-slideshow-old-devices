@@ -108,12 +108,14 @@ Example:
 http://localhost:8080/?random=true&duration=3
 ```
 
-## Docker Hub
+## Management
 
-The application is available as a Docker image on Docker Hub:
+http://localhost:8080/management.php
+
+## Docker 
 
 ```bash
-docker pull damarte/immich-slideshow-old-devices:latest
+docker compose up -d --build
 ```
 
 ## License
