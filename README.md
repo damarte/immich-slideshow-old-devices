@@ -52,7 +52,7 @@ cp .env.example .env
 ```env
 IMMICH_URL=http://your-immich-server:2283
 IMMICH_API_KEY=your_api_key
-ALBUM_ID=your_album_id
+ALBUM_ID=your_album_id,another_album_id
 CAROUSEL_DURATION=5
 CSS_BACKGROUND_COLOR=black
 RANDOM_ORDER=false
@@ -86,7 +86,7 @@ The application will be available at `http://localhost:8080`
 | -------------------- | ---------------------------------------------------- | ----------------- | -------- |
 | IMMICH_URL           | URL of your Immich server                            | -                 | Yes      |
 | IMMICH_API_KEY       | Your Immich API key                                  | -                 | Yes      |
-| ALBUM_ID             | ID of the album to display                           | -                 | Yes      |
+| ALBUM_ID             | ID of the album(s) to display (comma separated)      | -                 | Yes      |
 | CAROUSEL_DURATION    | Time in seconds between slides                       | 5                 | No       |
 | CSS_BACKGROUND_COLOR | Background color of the slideshow                    | black             | No       |
 | RANDOM_ORDER         | Show photos in random order                          | false             | No       |
@@ -98,7 +98,7 @@ The application will be available at `http://localhost:8080`
 
 You can override the environment variables using query parameters in the URL:
 
-- `album_id`: Override the ALBUM_ID
+- `album_id`: Override the ALBUM_ID (can be comma separated)
 - `duration`: Override the CAROUSEL_DURATION
 - `background`: Override the CSS_BACKGROUND_COLOR
 - `random`: Override the RANDOM_ORDER (use 'true' or 'false')

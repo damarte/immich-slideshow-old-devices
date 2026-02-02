@@ -41,10 +41,26 @@ if ($carousel_duration < 1) {
 try {
     // Initialize API and fetch photos
     $api = new ImmichApi($immich_url, $immich_api_key);
-    $photos = $api->getAlbumAssets($album_id);
+    
+    // Support multiple album IDs separated by comma
+    $album_ids = explode(',', $album_id);
+    $photos = [];
+
+    foreach ($album_ids as $id) {
+        $id = trim($id);
+        if (empty($id)) continue;
+        
+        try {
+            $album_photos = $api->getAlbumAssets($id);
+            $photos = array_merge($photos, $album_photos);
+        } catch (Exception $e) {
+            // Log error but continue with other albums
+            error_log("Warning: Failed to fetch photos from album $id: " . $e->getMessage());
+        }
+    }
     
     if (empty($photos)) {
-        throw new Exception("No photos found in the specified album");
+        throw new Exception("No photos found in the specified album(s)");
     }
 
     // Filter photos by orientation if needed
