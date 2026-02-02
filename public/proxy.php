@@ -101,11 +101,6 @@ try {
     } elseif ($data[0] === 'image/png') {
         imagepng($resized);
     }
-
-    // Free memory
-    imagedestroy($source);
-    imagedestroy($resized);
-    
 } catch (\Exception $e) {
     http_response_code(500);
     echo "Error: Unable to process image. " . $e->getMessage();
