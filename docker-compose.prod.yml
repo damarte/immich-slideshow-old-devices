@@ -13,3 +13,4 @@ services:
       - RANDOM_ORDER=${RANDOM_ORDER:-false}
       - STATUS_BAR_STYLE=${STATUS_BAR_STYLE:-black-translucent}
       - IMAGES_ORIENTATION=${IMAGES_ORIENTATION:-all}
+      - CROP_TO_SCREEN=${CROP_TO_SCREEN:-true}

@@ -10,7 +10,7 @@ I searched for projects already created for this purpose and found the great [Im
 > If your device supports [Immich Kiosk](https://github.com/damongolding/immich-kiosk), maybe you should use it before this project.
 
 > [!IMPORTANT]
-> **This project is not affiliated with [Immich][immich-github-url]**
+> **This project is not affiliated with [Immich](https://github.com/immich-app/immich)**
 
 ## Features
 
@@ -35,17 +35,20 @@ I searched for projects already created for this purpose and found the great [Im
 ## Installation
 
 1. Clone this repository:
+
 ```bash
 git clone https://github.com/yourusername/immich-slideshow-old-devices.git
 cd immich-slideshow-old-devices
 ```
 
 2. Copy the environment file and configure it:
+
 ```bash
 cp .env.example .env
 ```
 
 3. Edit the `.env` file with your settings:
+
 ```env
 IMMICH_URL=http://your-immich-server:2283
 IMMICH_API_KEY=your_api_key
@@ -79,16 +82,17 @@ The application will be available at `http://localhost:8080`
 
 ## Environment Variables
 
-| Variable | Description | Default | Required |
-|----------|------------|---------|----------|
-| IMMICH_URL | URL of your Immich server | - | Yes |
-| IMMICH_API_KEY | Your Immich API key | - | Yes |
-| ALBUM_ID | ID of the album to display | - | Yes |
-| CAROUSEL_DURATION | Time in seconds between slides | 5 | No |
-| CSS_BACKGROUND_COLOR | Background color of the slideshow | black | No |
-| RANDOM_ORDER | Show photos in random order | false | No |
-| STATUS_BAR_STYLE | Style of the iOS status bar | black-translucent | No |
-| IMAGES_ORIENTATION | Orientation of the images (landscape/portrait/all) | all | No |
+| Variable             | Description                                          | Default           | Required |
+| -------------------- | ---------------------------------------------------- | ----------------- | -------- |
+| IMMICH_URL           | URL of your Immich server                            | -                 | Yes      |
+| IMMICH_API_KEY       | Your Immich API key                                  | -                 | Yes      |
+| ALBUM_ID             | ID of the album to display                           | -                 | Yes      |
+| CAROUSEL_DURATION    | Time in seconds between slides                       | 5                 | No       |
+| CSS_BACKGROUND_COLOR | Background color of the slideshow                    | black             | No       |
+| RANDOM_ORDER         | Show photos in random order                          | false             | No       |
+| STATUS_BAR_STYLE     | Style of the iOS status bar                          | black-translucent | No       |
+| IMAGES_ORIENTATION   | Orientation of the images (landscape/portrait/all)   | all               | No       |
+| CROP_TO_SCREEN       | Crop images to fill the screen (true) or fit (false) | true              | No       |
 
 ## Query Parameters
 
@@ -102,6 +106,7 @@ You can override the environment variables using query parameters in the URL:
 - `orientation`: Override the IMAGES_ORIENTATION (use 'landscape', 'portrait', or 'all')
 
 Example:
+
 ```
 http://localhost:8080/?random=true&duration=3
 ```

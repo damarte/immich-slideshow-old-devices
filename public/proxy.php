@@ -36,20 +36,42 @@ try {
     $source_width = imagesx($source);
     $source_height = imagesy($source);
 
+    // Get cropping configuration
+    $crop_to_screen = getenv('CROP_TO_SCREEN') !== 'false'; // Default to true
+
     // Calculate scale factors for both dimensions
     $scale_w = $screen_width / $source_width;
     $scale_h = $screen_height / $source_height;
     
-    // Use the larger scaling factor to ensure the image covers the screen
-    $scale = max($scale_w, $scale_h);
-    
-    // Calculate dimensions after scaling
-    $scaled_width = $source_width * $scale;
-    $scaled_height = $source_height * $scale;
-    
-    // Calculate cropping positions to center the image
-    $crop_x = ($scaled_width - $screen_width) / 2 / $scale;
-    $crop_y = ($scaled_height - $screen_height) / 2 / $scale;
+    if ($crop_to_screen) {
+        // CROP: Use the larger scaling factor to ensure the image covers the screen
+        $scale = max($scale_w, $scale_h);
+        
+        // CROP: Logic - Crop source, fill destination
+        $dst_x = 0;
+        $dst_y = 0;
+        $dst_w = $screen_width;
+        $dst_h = $screen_height;
+        
+        $src_w = $screen_width / $scale;
+        $src_h = $screen_height / $scale;
+        $src_x = ($source_width - $src_w) / 2;
+        $src_y = ($source_height - $src_h) / 2;
+    } else {
+        // FIT: Use the smaller scaling factor to ensure the image fits within the screen
+        $scale = min($scale_w, $scale_h);
+        
+        // FIT: Logic - Full source, center in destination
+        $dst_w = $source_width * $scale;
+        $dst_h = $source_height * $scale;
+        $dst_x = ($screen_width - $dst_w) / 2;
+        $dst_y = ($screen_height - $dst_h) / 2;
+        
+        $src_x = 0;
+        $src_y = 0;
+        $src_w = $source_width;
+        $src_h = $source_height;
+    }
     
     // Create the new image with exact screen dimensions
     $resized = imagecreatetruecolor($screen_width, $screen_height);
@@ -64,11 +86,10 @@ try {
     imagecopyresampled(
         $resized,
         $source,
-        0, 0,                    // Destination x, y
-        (int)$crop_x, (int)$crop_y,  // Source x, y
-        $screen_width, $screen_height,         // Destination width, height
-        (int)($screen_width / $scale),        // Source width
-        (int)($screen_height / $scale)        // Source height
+        (int)$dst_x, (int)$dst_y,  // Destination x, y
+        (int)$src_x, (int)$src_y,  // Source x, y
+        (int)$dst_w, (int)$dst_h,  // Destination width, height
+        (int)$src_w, (int)$src_h   // Source width, height
     );
 
     // Send headers

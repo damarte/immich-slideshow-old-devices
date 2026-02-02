@@ -36,10 +36,16 @@ function initSlideshow(config) {
         // Show first image
         currentImg.src = buildProxyUrl(photos[0].id);
         currentImg.className = 'active';
+        currentImg.addEventListener("error", function () {
+            this.src = '/assets/apple-icon-180.png';
+        });
 
         // Preload second image if available
         if (totalPhotos > 1) {
             nextImg.src = buildProxyUrl(photos[1].id);
+            nextImg.addEventListener("error", function () {
+                this.src = '/assets/apple-icon-180.png';
+            });
         }
 
         // Add click handler for pause/play

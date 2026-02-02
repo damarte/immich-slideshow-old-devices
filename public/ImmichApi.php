@@ -52,7 +52,7 @@ class ImmichApi {
         curl_close($ch);
 
         if ($http_code !== 200 || $response === false) {
-            $error = "HTTP error $http_code when connecting to Immich";
+            $error = "HTTP error $http_code when connecting to Immich $response";
             error_log($error);
             throw new Exception($error);
         }
