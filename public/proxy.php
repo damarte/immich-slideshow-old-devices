@@ -33,15 +33,42 @@ try {
     $source_width = imagesx($source);
     $source_height = imagesy($source);
 
-    // 1. Calculate the scale to FIT the image inside the screen bounds
-    $scale = min($screen_width / $source_width, $screen_height / $source_height);
+    // Get cropping configuration
+    $crop_to_screen = getenv('CROP_TO_SCREEN') !== 'false'; // Default to true
+
+    // Calculate scale factors for both dimensions
+    $scale_w = $screen_width / $source_width;
+    $scale_h = $screen_height / $source_height;
     
-    $scaled_width = (int)($source_width * $scale);
-    $scaled_height = (int)($source_height * $scale);
-    
-    // 2. Calculate the "Letterbox" padding to center it
-    $dest_x = (int)(($screen_width - $scaled_width) / 2);
-    $dest_y = (int)(($screen_height - $scaled_height) / 2);
+    if ($crop_to_screen) {
+        // CROP: Use the larger scaling factor to ensure the image covers the screen
+        $scale = max($scale_w, $scale_h);
+        
+        // CROP: Logic - Crop source, fill destination
+        $dst_x = 0;
+        $dst_y = 0;
+        $dst_w = $screen_width;
+        $dst_h = $screen_height;
+        
+        $src_w = $screen_width / $scale;
+        $src_h = $screen_height / $scale;
+        $src_x = ($source_width - $src_w) / 2;
+        $src_y = ($source_height - $src_h) / 2;
+    } else {
+        // FIT: Use the smaller scaling factor to ensure the image fits within the screen
+        $scale = min($scale_w, $scale_h);
+        
+        // FIT: Logic - Full source, center in destination
+        $dst_w = $source_width * $scale;
+        $dst_h = $source_height * $scale;
+        $dst_x = ($screen_width - $dst_w) / 2;
+        $dst_y = ($screen_height - $dst_h) / 2;
+        
+        $src_x = 0;
+        $src_y = 0;
+        $src_w = $source_width;
+        $src_h = $source_height;
+    }
     
     // 3. Create a canvas the EXACT size of the Nixplay screen
     $resized = imagecreatetruecolor($screen_width, $screen_height);
@@ -52,11 +79,12 @@ try {
 
     // 5. Place the scaled photo onto the black canvas
     imagecopyresampled(
-        $resized, $source,
-        $dest_x, $dest_y,    // Move to center
-        0, 0,                // Source start
-        $scaled_width, $scaled_height, 
-        $source_width, $source_height
+        $resized,
+        $source,
+        (int)$dst_x, (int)$dst_y,  // Destination x, y
+        (int)$src_x, (int)$src_y,  // Source x, y
+        (int)$dst_w, (int)$dst_h,  // Destination width, height
+        (int)$src_w, (int)$src_h   // Source width, height
     );
 
     header("Content-Type: {$data[0]}");

@@ -90,8 +90,8 @@ try {
 <body>
     <div class="carousel">
         <a href="#" id="current-link">
-            <img src="/assets/apple-icon-180.png" id="current-img" />
-            <img src="/assets/apple-icon-180.png" id="next-img" />
+            <img src="/assets/apple-icon-180.png" id="current-img" alt="Current slideshow image"/>
+            <img src="/assets/apple-icon-180.png" id="next-img" alt="Next slideshow image"/>
         </a>
     </div>
     <img src="/assets/pause.png" alt="Pause icon" class="pause-icon" id="pause-icon"/>

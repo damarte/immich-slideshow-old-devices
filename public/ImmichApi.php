@@ -44,15 +44,13 @@ class ImmichApi {
         if ($response === false) {
             $error = "Error: " . curl_error($ch);
             error_log($error);
-            curl_close($ch);
             throw new Exception($error);
         }
 
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
 
         if ($http_code !== 200 || $response === false) {
-            $error = "HTTP error $http_code when connecting to Immich";
+            $error = "HTTP error $http_code when connecting to Immich $response";
             error_log($error);
             throw new Exception($error);
         }
@@ -126,13 +124,11 @@ class ImmichApi {
         $image_data = curl_exec($ch);
         if ($image_data === false) {
             $error = curl_error($ch);
-            curl_close($ch);
             throw new Exception("Error cURL: {$error}");
         }
 
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $content_type = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-        curl_close($ch);
 
         if ($http_code !== 200) {
             throw new Exception("Error HTTP {$http_code} when connecting to Immich");
@@ -157,7 +153,6 @@ class ImmichApi {
                 ob_start();
                 imagejpeg($image, null, 85); // Add compression quality
                 $image_data = ob_get_clean();
-                imagedestroy($image);
                 $content_type = 'image/jpeg';
             } finally {
                 fclose($temp);
