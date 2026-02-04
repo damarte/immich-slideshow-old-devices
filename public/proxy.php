@@ -1,9 +1,12 @@
 <?php
 require_once './ImmichApi.php';
+require_once './Configuration.php';
+
+$configuration = new Configuration();
 
 // Get configuration from environment variables
-$immich_url = getenv('IMMICH_URL');
-$immich_api_key = getenv('IMMICH_API_KEY');
+$immich_url = $configuration->get(Configuration::IMMICH_URL);
+$immich_api_key = $configuration->get(Configuration::IMMICH_API_KEY);
 
 // Get and validate request parameters
 $asset_id = isset($_GET['asset']) ? trim($_GET['asset']) : null;
@@ -22,19 +25,27 @@ try {
     header('Cache-Control: public, max-age=3600');
     header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
 
+    // Get asset from Immich API (always get the full size image)
     $api = new ImmichApi($immich_url, $immich_api_key);
     $data = $api->getAsset($asset_id, 'fullsize');
 
+    // Create image from binary data
     $source = imagecreatefromstring($data[1]);
     if ($source === false) {
         throw new Exception("Failed to create image from source");
     }
 
+    // Get original dimensions
     $source_width = imagesx($source);
     $source_height = imagesy($source);
 
     // Get cropping configuration
-    $crop_to_screen = getenv('CROP_TO_SCREEN') !== 'false'; // Default to true
+    $crop_to_screen = $configuration->get(Configuration::CROP) !== 'false'; // Default to true
+
+    // Get background color
+    $background = preg_match('/^[a-zA-Z0-9#]+$/', $_GET['background'] ?? '') 
+    ? $_GET['background'] 
+    : ($configuration->get(Configuration::BACKGROUND_COLOR) ?? '#000000');
 
     // Calculate scale factors for both dimensions
     $scale_w = $screen_width / $source_width;
@@ -70,14 +81,26 @@ try {
         $src_h = $source_height;
     }
     
-    // 3. Create a canvas the EXACT size of the Nixplay screen
+    // Create the new image with exact screen dimensions
     $resized = imagecreatetruecolor($screen_width, $screen_height);
-    
-    // 4. Fill background with Black (RGB 0,0,0)
-    $black = imagecolorallocate($resized, 0, 0, 0);
-    imagefill($resized, 0, 0, $black);
 
-    // 5. Place the scaled photo onto the black canvas
+    // Background color
+    $hex = ltrim($background, '#');
+
+    if (strlen($hex) == 3) {
+        $r = hexdec(str_repeat(substr($hex, 0, 1), 2));
+        $g = hexdec(str_repeat(substr($hex, 1, 1), 2));
+        $b = hexdec(str_repeat(substr($hex, 2, 1), 2));
+    } else {
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+    }
+
+    $background = imagecolorallocate($resized, $r, $g, $b);
+    imagefill($resized, 0, 0, $background);
+
+    // Resize and crop the image
     imagecopyresampled(
         $resized,
         $source,
@@ -87,18 +110,16 @@ try {
         (int)$src_w, (int)$src_h   // Source width, height
     );
 
+    // Send headers
     header("Content-Type: {$data[0]}");
     
+    // Output image based on type
     if ($data[0] === 'image/jpeg') {
         imagejpeg($resized, null, 85);
     } elseif ($data[0] === 'image/png') {
         imagepng($resized);
     }
-
-    imagedestroy($source);
-    imagedestroy($resized);
-    
 } catch (\Exception $e) {
     http_response_code(500);
-    echo "Error: " . $e->getMessage();
+    echo "Error: Unable to process image. " . $e->getMessage();
 }

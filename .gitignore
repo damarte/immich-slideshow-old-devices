@@ -1,4 +1,5 @@
 .env
+public/config.json
 
 .vscode/*
 !.vscode/settings.json
@@ -13,5 +14,3 @@
 # Built Visual Studio Code Extensions
 *.vsix*
 *.log
-
-config.json

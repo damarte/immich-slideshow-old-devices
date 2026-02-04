@@ -1,0 +1,168 @@
+/* Reset and base styles */
+body {
+    font-family: sans-serif;
+    background: #121212;
+    color: white;
+    margin: 0;
+    padding-bottom: 21.5rem;
+    overflow-y: auto !important;
+    height: auto;
+}
+
+.container {
+    max-width: 37.5rem;
+    margin: 0 auto;
+    position: relative;
+    padding: 1rem;
+}
+
+.footer {
+    position: fixed;
+    background: #1e1e1e;
+    border: 1px solid #333;
+    z-index: 100;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1rem;
+}
+
+.flex {
+    display: flex;
+    gap: 0.625rem;
+    margin-bottom: 0.625rem;
+}
+
+/* Typography & Forms */
+label {
+    font-size: 0.6875rem;
+    color: #888;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+select,
+input,
+button {
+    background: #333;
+    color: white;
+    border: 1px solid #444;
+    padding: 0.625rem;
+    border-radius: 0.3125rem;
+    font-size: 0.875rem;
+}
+
+input[type="color"] {
+    padding: 0;
+    height: 2.5rem;
+    width: 100%;
+}
+
+.btn-update {
+    text-transform: uppercase;
+    background: #2196f3;
+    font-weight: bold;
+    border: none;
+    height: 2.8125rem;
+    cursor: pointer;
+}
+
+/* Alerts */
+.alert {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.25rem;
+    text-align: center;
+}
+
+.alert-success {
+    background: #2e7d32;
+}
+
+.alert-error {
+    background: #d32f2f;
+}
+
+/* Album Grid & Cards */
+.album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+    gap: 0.625rem;
+}
+
+.album-card {
+    position: relative;
+    background: #1e1e1e;
+    border-radius: 0.5rem;
+    border: 0.125rem solid transparent;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.album-card img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    display: block;
+    background: #333;
+}
+
+.album-card p {
+    margin: 0.3125rem;
+    font-size: 0.75rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.album-card:hover {
+    transform: scale(1.02);
+    border-color: #444;
+}
+
+/* Checkbox & Checkmark */
+.album-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+/* Checkmark Badge */
+.checkmark {
+    position: absolute;
+    top: 0.3125rem;
+    right: 0.3125rem;
+    background: #2196f3;
+    color: white;
+    border-radius: 50%;
+    width: 1.25rem;
+    height: 1.25rem;
+    display: none; /* Hidden by default */
+    text-align: center;
+    line-height: 1.25rem;
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+/* Checked States */
+
+/* Highlight card when checked */
+.album-checkbox:checked + .album-card {
+    border-color: #2196f3;
+    background: #263238;
+    box-shadow: 0 0 0.625rem rgba(33, 150, 243, 0.5);
+}
+
+/* Show checkmark when checked */
+.album-checkbox:checked + .album-card .checkmark {
+    display: block;
+}
+
+/* Keep blue border on hover if checked */
+.album-checkbox:checked + .album-card:hover {
+    border-color: #2196f3;
+}

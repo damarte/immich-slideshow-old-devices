@@ -26,6 +26,8 @@ I searched for projects already created for this purpose and found the great [Im
 - Built-in image caching for better performance
 - Filter images by orientation (landscape/portrait/all)
 - Pause/resume slide
+- Management UI [@JosephAntony1](https://github.com/JosephAntony1)
+- Remote control support [@JosephAntony1](https://github.com/JosephAntony1)
 
 ## Requirements
 
@@ -60,6 +62,7 @@ CSS_BACKGROUND_COLOR=black
 RANDOM_ORDER=false
 STATUS_BAR_STYLE=black-translucent
 IMAGES_ORIENTATION=all
+CROP_TO_SCREEN=true
 ```
 
 ## Usage
@@ -96,6 +99,14 @@ The application will be available at `http://localhost:8080`
 | IMAGES_ORIENTATION   | Orientation of the images (landscape/portrait/all)   | all               | No       |
 | CROP_TO_SCREEN       | Crop images to fill the screen (true) or fit (false) | true              | No       |
 
+## Management UI
+
+You can override the environment variables using management UI, navigate to:
+
+```
+http://localhost:8080/management.php
+```
+
 ## Query Parameters
 
 You can override the environment variables using query parameters in the URL:
@@ -113,12 +124,7 @@ Example:
 http://localhost:8080/?random=true&duration=3
 ```
 
-## Management
-```
-http://localhost:8080/management.php
-```
-
-## Docker 
+## Docker
 
 ```bash
 docker compose up -d --build

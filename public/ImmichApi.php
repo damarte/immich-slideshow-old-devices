@@ -20,6 +20,48 @@ class ImmichApi {
     }
 
     /**
+     * Get albums
+     * 
+     * @return array List of albums
+     * @throws Exception If there's an error in the request
+     */
+    public function getAlbums(): array {
+        $url = "{$this->immich_url}/api/albums";
+        $ch = curl_init($url);
+        
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "x-api-key: {$this->api_key}",
+            "Accept: application/json"
+        ]);
+
+        $response = curl_exec($ch);
+        if ($response === false) {
+            $error = "Error: " . curl_error($ch);
+            error_log($error);
+            throw new Exception($error);
+        }
+
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($http_code !== 200 || $response === false) {
+            $error = "HTTP error $http_code when connecting to Immich $response";
+            error_log($error);
+            throw new Exception($error);
+        }
+
+        $data = json_decode($response, true);
+        
+        if (!is_array($data)) {
+            $error = "Invalid response from Immich: $response";
+            error_log($error);
+            throw new Exception($error);
+        }
+
+        return $data;
+    }
+
+    /**
      * Get album assets
      * 
      * @param string $album_id Album ID
