@@ -76,9 +76,50 @@ function buildProxyUrl(assetId) {
 /**
  * Loads the next image in the slideshow
  */
-function nextImage() {
-    if (totalPhotos === 0 || isTransitioning || isPaused) return;
+function previousImage() {
+    if (totalPhotos === 0 || isTransitioning) return;
+    if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
     
+    isTransitioning = true;
+    
+    // Adding totalPhotos ensures the result is always positive
+    currentIndex = (currentIndex - 1 + totalPhotos) % totalPhotos;
+
+    // If you want it to reload when hitting the "beginning"
+    if (currentIndex === totalPhotos - 1) { 
+        // This triggers if they press 'Back' at the very first photo
+        // window.location.reload(); 
+        // return;
+    }
+
+    // Unlike nextImage, we need the "new" (previous) image ready NOW
+    nextImg.src = buildProxyUrl(photos[currentIndex].id);
+
+    currentImg.className = '';
+    nextImg.className = 'active';
+
+    var temp = currentImg;
+    currentImg = nextImg;
+    nextImg = temp;
+
+    setTimeout(function () {
+        var nextIndex = (currentIndex + 1) % totalPhotos;
+        nextImg.src = buildProxyUrl(photos[nextIndex].id);
+        isTransitioning = false;
+        
+        // Resume the timer so it doesn't get stuck forever
+        scheduleNextTransition();
+    }, 1000);
+}
+
+/**
+ * Loads the next image in the slideshow
+ */
+function nextImage() {
+    if (totalPhotos === 0 || isTransitioning ) return;
+    
+    if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
+
     isTransitioning = true;
     
     // Move to next index
@@ -123,7 +164,10 @@ function scheduleNextTransition() {
  * Toggles pause state
  */
 function togglePause(e) {
-    e.preventDefault();
+    // If an event was passed, stop the default action (like scrolling)
+    if (e && typeof e.preventDefault === 'function') {
+        e.preventDefault();
+    }
     isPaused = !isPaused;
     
     if (isPaused) {
@@ -139,3 +183,6 @@ function togglePause(e) {
 
 // Resize event handler
 window.addEventListener('resize', updateScreenDimensions);
+// This makes the functions visible to index.php
+window.nextImage = nextImage;
+window.previousImage = previousImage;

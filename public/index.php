@@ -7,24 +7,27 @@
  */
 
 require_once './ImmichApi.php';
+require_once './Configuration.php';
+
+$configuration = new Configuration();
 
 // Configuration parameters with validation
-$immich_url = getenv('IMMICH_URL');
-$immich_api_key = getenv('IMMICH_API_KEY');
+$immich_url = $configuration->get(Configuration::IMMICH_URL);
+$immich_api_key = $configuration->get(Configuration::IMMICH_API_KEY);
 
 // Get and validate input parameters with defaults
-$album_id = $_GET['album_id'] ?? getenv('ALBUM_ID');
-$carousel_duration = (int)($_GET['duration'] ?? getenv('CAROUSEL_DURATION') ?? 5);
+$album_id = $_GET['album_id'] ?? $configuration->get(Configuration::ALBUM_ID);
+$carousel_duration = (int)($_GET['duration'] ?? $configuration->get(Configuration::CAROUSEL_DURATION) ?? 5);
 $background = preg_match('/^[a-zA-Z0-9#]+$/', $_GET['background'] ?? '') 
     ? $_GET['background'] 
-    : (getenv('CSS_BACKGROUND_COLOR') ?? 'black');
-$random_order = filter_var($_GET['random'] ?? getenv('RANDOM_ORDER') ?? 'false', FILTER_VALIDATE_BOOLEAN);
+    : ($configuration->get(Configuration::BACKGROUND_COLOR) ?? '#000000');
+$random_order = filter_var($_GET['random'] ?? $configuration->get(Configuration::RANDOM_ORDER) ?? 'false', FILTER_VALIDATE_BOOLEAN);
 $status_bar_style = in_array($_GET['status_bar'] ?? '', ['default', 'black-translucent', 'black']) 
     ? $_GET['status_bar'] 
-    : (getenv('STATUS_BAR_STYLE') ?? 'black-translucent');
+    : ($configuration->get(Configuration::STATUS_BAR_STYLE) ?? 'black-translucent');
 $orientation = in_array($_GET['orientation'] ?? '', ['landscape', 'portrait', 'all']) 
     ? $_GET['orientation'] 
-    : (getenv('IMAGES_ORIENTATION') ?? 'all');
+    : ($configuration->get(Configuration::ORIENTATION) ?? 'all');
 
 // Validate required parameters
 if (!$album_id) {
@@ -94,12 +97,12 @@ try {
     <meta name="apple-mobile-web-app-status-bar" content="<?php echo htmlspecialchars($status_bar_style); ?>"/>
     <meta name="theme-color" content="<?php echo htmlspecialchars($background); ?>"/>
     <title>Immich Slideshow</title>
-    <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico"/>
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-icon-180.png"/>
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"/>
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png"/>
-    <link rel="stylesheet" href="/assets/main.css"/>
-    <script src="/assets/main.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico?v=<?php echo filemtime('assets/favicon.ico'); ?>"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-icon-180.png?v=<?php echo filemtime('assets/apple-icon-180.png'); ?>"/>
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=<?php echo filemtime('assets/favicon-32.png'); ?>"/>
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png?v=<?php echo filemtime('assets/favicon-16.png'); ?>"/>
+    <link rel="stylesheet" href="assets/main.css?v=<?php echo filemtime('assets/main.css'); ?>"/>
+    <script src="assets/main.js?v=<?php echo filemtime('assets/main.js'); ?>"></script>
     <style>
         html, body {
             background-color: <?php echo htmlspecialchars($background); ?>;
@@ -109,16 +112,53 @@ try {
 <body>
     <div class="carousel">
         <a href="#" id="current-link">
-            <img src="/assets/apple-icon-180.png" id="current-img" alt="Current slideshow image"/>
-            <img src="/assets/apple-icon-180.png" id="next-img" alt="Next slideshow image"/>
+            <img src="assets/apple-icon-180.png" id="current-img" alt="Current slideshow image"/>
+            <img src="assets/apple-icon-180.png" id="next-img" alt="Next slideshow image"/>
         </a>
     </div>
-    <img src="/assets/pause.png" alt="Pause icon" class="pause-icon" id="pause-icon"/>
+    <img src="assets/pause.png" alt="Pause icon" class="pause-icon" id="pause-icon"/>
     <script>
         initSlideshow({
             photos: <?php echo json_encode($photos); ?>,
             duration: <?php echo $carousel_duration; ?>
         });
+
+        document.onkeydown = function(e) {
+        e = e || window.event;
+        var keyCode = e.keyCode || e.which;
+
+        switch(keyCode) {
+            // --- REFRESH (Up Arrow) ---
+            case 38: 
+                // Remote: Manual Refresh
+                window.location.reload();
+                break;
+
+            // --- FORWARD (Right Arrow & Down Arrow) ---
+            case 39: // Right Arrow
+            case 40: // Down Arrow
+                if (typeof nextImage === 'function') {
+                    nextImage();
+                }
+                break;
+
+            // --- BACKWARD (Left Arrow) ---
+            case 37: // Left Arrow
+                if (typeof previousImage === 'function') {
+                    previousImage();
+                } else {
+                    window.location.reload();
+                }
+                break;
+
+            // --- CENTER (Enter / OK) ---
+            case 13: // Enter
+                if (typeof togglePause === 'function') {
+                    togglePause();
+                }
+                break;
+        }
+    };
     </script>
 </body>
 </html>
