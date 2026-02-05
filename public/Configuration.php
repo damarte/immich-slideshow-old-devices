@@ -9,8 +9,8 @@ class Configuration {
     const ALBUM_ID = 'ALBUM_ID';
     const CAROUSEL_DURATION = 'CAROUSEL_DURATION';
     const RANDOM_ORDER = 'RANDOM_ORDER';
-    const CROP = 'CROP';
-    const ORIENTATION = 'ORIENTATION';
+    const CROP = 'CROP_TO_SCREEN';
+    const ORIENTATION = 'IMAGES_ORIENTATION';
     const BACKGROUND_COLOR = 'BACKGROUND_COLOR';
     const STATUS_BAR_STYLE = 'STATUS_BAR_STYLE';
 
