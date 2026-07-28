@@ -62,7 +62,7 @@ IMMICH_URL=http://your-immich-server:2283
 IMMICH_API_KEY=your_api_key
 ALBUM_ID=your_album_id,another_album_id
 CAROUSEL_DURATION=5
-CSS_BACKGROUND_COLOR=black
+BACKGROUND_COLOR=black
 RANDOM_ORDER=false
 STATUS_BAR_STYLE=black-translucent
 IMAGES_ORIENTATION=all
@@ -98,7 +98,7 @@ The application will be available at `http://localhost:8080`
 | IMMICH_API_KEY       | Your Immich API key                                  | -                 | Yes      |
 | ALBUM_ID             | ID of the album(s) to display (comma separated). Use the special value `favorites` to show your Immich favorites | -                 | Yes      |
 | CAROUSEL_DURATION    | Time in seconds between slides                       | 5                 | No       |
-| CSS_BACKGROUND_COLOR | Background color of the slideshow                    | black             | No       |
+| BACKGROUND_COLOR     | Background color of the slideshow                    | black             | No       |
 | RANDOM_ORDER         | Show photos in random order                          | false             | No       |
 | STATUS_BAR_STYLE     | Style of the iOS status bar                          | black-translucent | No       |
 | IMAGES_ORIENTATION   | Orientation of the images (landscape/portrait/all)   | all               | No       |
@@ -121,7 +121,7 @@ You can override the environment variables using query parameters in the URL:
 
 - `album_id`: Override the ALBUM_ID (can be comma separated). Use the special value `favorites` to show your Immich favorites, e.g. `?album_id=favorites` or `?album_id=favorites,your_album_id`
 - `duration`: Override the CAROUSEL_DURATION
-- `background`: Override the CSS_BACKGROUND_COLOR
+- `background`: Override the BACKGROUND_COLOR
 - `random`: Override the RANDOM_ORDER (use 'true' or 'false')
 - `status_bar`: Override the STATUS_BAR_STYLE (use 'default', 'black-translucent', or 'black')
 - `orientation`: Override the IMAGES_ORIENTATION (use 'landscape', 'portrait', or 'all')
