@@ -59,7 +59,7 @@ try {
 }
 
 // Get configuration
-$album_ids = explode(',', $configuration->get(Configuration::ALBUM_ID)) ?? [];
+$album_ids = empty($configuration->get(Configuration::ALBUM_ID)) ? [] : explode(',', $configuration->get(Configuration::ALBUM_ID));
 $duration = $configuration->get(Configuration::CAROUSEL_DURATION) ?? 10;
 $random = $configuration->get(Configuration::RANDOM_ORDER) ?? 'true';
 $crop = $configuration->get(Configuration::CROP) ?? 'true';
