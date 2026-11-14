@@ -98,7 +98,7 @@ The application will be available at `http://localhost:8080`
 | IMMICH_API_KEY       | Your Immich API key                                  | -                 | Yes      |
 | ALBUM_ID             | ID of the album(s) to display (comma separated). Use the special value `favorites` to show your Immich favorites | -                 | Yes      |
 | CAROUSEL_DURATION    | Time in seconds between slides                       | 5                 | No       |
-| CSS_BACKGROUND_COLOR | Background color of the slideshow                    | black             | No       |
+| CSS_BACKGROUND_COLOR | Background color of the slideshow: a hex value (`#000000`, `#000`) or a common color name (`black`, `white`, `gray`...). `BACKGROUND_COLOR` is accepted as an alias | black             | No       |
 | RANDOM_ORDER         | Show photos in random order                          | false             | No       |
 | STATUS_BAR_STYLE     | Style of the iOS status bar                          | black-translucent | No       |
 | IMAGES_ORIENTATION   | Orientation of the images (landscape/portrait/all)   | all               | No       |
