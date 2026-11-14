@@ -35,7 +35,7 @@ I searched for projects already created for this purpose and found the great [Im
 
 ## Requirements
 
-- Docker and Docker Compose
+- Docker and Docker Compose, or a Linux host/LXC/VM with Nginx and PHP-FPM (see [Running without Docker](#running-without-docker))
 - Access to an Immich server
 - Immich API key
 - Album ID from your Immich server
@@ -89,6 +89,51 @@ docker-compose -f docker-compose.prod.yml up -d
 ```
 
 The application will be available at `http://localhost:8080`
+
+## Running without Docker
+
+Docker is the recommended way to run the slideshow. If you prefer a plain host, an LXC container (for example on Proxmox) or a VM, the app only needs Nginx and PHP-FPM with the `gd` and `curl` extensions. Tested on Debian 13 (PHP 8.4); a 1 vCPU / 512 MB container is enough.
+
+1. Install the packages:
+
+```bash
+apt update
+apt install -y nginx php-fpm php-gd php-curl git
+```
+
+2. Copy the application:
+
+```bash
+git clone https://github.com/damarte/immich-slideshow-old-devices.git /opt/immich-slideshow
+rm -rf /var/www/html/*
+cp -r /opt/immich-slideshow/public/. /var/www/html/
+chown -R www-data:www-data /var/www/html
+```
+
+`www-data` must own the folder because the management UI writes `config.json` there.
+
+3. Configure PHP-FPM. It does not pass the system environment to PHP, so the settings go on the pool instead of a `.env` file. Append the lines from [`deploy/php-fpm-env.conf`](deploy/php-fpm-env.conf) to `/etc/php/8.4/fpm/pool.d/www.conf`, with your values, and raise the memory limit like the Docker image does:
+
+```bash
+echo "memory_limit=256M" > /etc/php/8.4/fpm/conf.d/99-immich-slideshow.ini
+```
+
+4. Configure Nginx with [`deploy/nginx.conf`](deploy/nginx.conf). The `nginx.conf` at the repository root is for the Docker image (PHP-FPM on TCP port 9000); on Debian PHP-FPM listens on a Unix socket:
+
+```bash
+cp /opt/immich-slideshow/deploy/nginx.conf /etc/nginx/sites-available/default
+```
+
+5. Check and start:
+
+```bash
+php-fpm8.4 -t && systemctl restart php8.4-fpm nginx
+systemctl enable php8.4-fpm nginx
+```
+
+The slideshow is served on port 80 (`http://your-host/`). Replace `8.4` with your PHP version in the paths above (`ls /run/php/`).
+
+To update, `git pull` in `/opt/immich-slideshow` and copy `public/` again, keeping `/var/www/html/config.json` if you use the management UI.
 
 ## Environment Variables
 
