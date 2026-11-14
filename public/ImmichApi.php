@@ -87,6 +87,78 @@ class ImmichApi {
     }
 
     /**
+     * Get photos taken within a date range (either end may be null)
+     *
+     * @param string|null $after  Start date, YYYY-MM-DD (inclusive)
+     * @param string|null $before End date, YYYY-MM-DD (inclusive)
+     * @return array List of assets
+     * @throws Exception If there's an error in the request
+     */
+    public function getAssetsByDate(?string $after, ?string $before): array {
+        // visibility=timeline leaves out archived, hidden and locked assets
+        $filters = ['type' => 'IMAGE', 'visibility' => 'timeline'];
+        if (!empty($after)) {
+            $filters['takenAfter'] = $after . 'T00:00:00.000Z';
+        }
+        if (!empty($before)) {
+            $filters['takenBefore'] = $before . 'T23:59:59.999Z';
+        }
+        return $this->searchAssets($filters);
+    }
+
+    /**
+     * Get photos with a given tag
+     *
+     * @param string $tag Tag name, full path (Parent/Child) or tag ID
+     * @return array List of assets
+     * @throws Exception If the tag does not exist or the request fails
+     */
+    public function getAssetsByTag(string $tag): array {
+        return $this->searchAssets([
+            'tagIds' => [$this->resolveTagId($tag)],
+            'type' => 'IMAGE',
+            'visibility' => 'timeline',
+        ]);
+    }
+
+    /**
+     * Find a tag ID by name or full path (case-insensitive); IDs pass through
+     */
+    private function resolveTagId(string $tag): string {
+        $tag = trim($tag);
+        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $tag)) {
+            return $tag;
+        }
+
+        $ch = curl_init("{$this->immich_url}/api/tags");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "x-api-key: {$this->api_key}",
+            "Accept: application/json"
+        ]);
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($response === false || $http_code !== 200) {
+            $error = "HTTP error $http_code when listing Immich tags (the API key needs tag.read)";
+            error_log($error);
+            throw new Exception($error);
+        }
+
+        // mbstring is not always installed; fall back to strtolower
+        $lower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
+        $wanted = $lower($tag);
+        foreach (json_decode($response, true) ?: [] as $t) {
+            if ($lower($t['value'] ?? '') === $wanted || $lower($t['name'] ?? '') === $wanted) {
+                return $t['id'];
+            }
+        }
+
+        $error = "Tag not found in Immich: $tag";
+        error_log($error);
+        throw new Exception($error);
+    }
+
+    /**
      * Get the ID of one favorite asset, for use as a thumbnail
      *
      * @return string|null Asset ID, or null if there are no favorites

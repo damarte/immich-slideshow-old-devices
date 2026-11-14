@@ -29,6 +29,7 @@ I searched for projects already created for this purpose and found the great [Im
 - Built-in image caching for better performance
 - Filter images by orientation (landscape/portrait/all)
 - Use your Immich favorites as a source, alone or combined with albums
+- Use photos taken since a date, within a date range, or with an Immich tag as a source
 - Pause/resume slide
 - Management UI [@JosephAntony1](https://github.com/JosephAntony1)
 - Remote control support [@JosephAntony1](https://github.com/JosephAntony1)
@@ -96,7 +97,7 @@ The application will be available at `http://localhost:8080`
 | -------------------- | ---------------------------------------------------- | ----------------- | -------- |
 | IMMICH_URL           | URL of your Immich server                            | -                 | Yes      |
 | IMMICH_API_KEY       | Your Immich API key                                  | -                 | Yes      |
-| ALBUM_ID             | ID of the album(s) to display (comma separated). Use the special value `favorites` to show your Immich favorites | -                 | Yes      |
+| ALBUM_ID             | Source(s) to display, comma separated: album IDs, `favorites`, `since:YYYY-MM-DD`, `range:YYYY-MM-DD..YYYY-MM-DD` or `tag:Name` (see [Photo sources](#photo-sources)) | -                 | Yes      |
 | CAROUSEL_DURATION    | Time in seconds between slides                       | 5                 | No       |
 | CSS_BACKGROUND_COLOR | Background color of the slideshow                    | black             | No       |
 | RANDOM_ORDER         | Show photos in random order                          | false             | No       |
@@ -104,6 +105,22 @@ The application will be available at `http://localhost:8080`
 | IMAGES_ORIENTATION   | Orientation of the images (landscape/portrait/all)   | all               | No       |
 | CROP_TO_SCREEN       | Crop images to fill the screen (true) or fit (false) | true              | No       |
 | IMAGE_QUALITY        | Image size requested from Immich (preview/fullsize). `preview` is server-side resized and recommended; `fullsize` needs much more memory for large photos | preview           | No       |
+
+## Photo sources
+
+`ALBUM_ID` (and the `album_id` query parameter) accepts a comma separated list of sources. Photos from all sources are combined:
+
+| Source | Shows |
+| ------ | ----- |
+| `<album id>` | Photos in that album |
+| `favorites` | Your Immich favorites |
+| `since:2024-01-01` | Photos taken on or after that date |
+| `range:2024-01-01..2024-12-31` | Photos taken within that range (both days included) |
+| `tag:Family` | Photos with that Immich tag. Use the full path for nested tags (`tag:Trips/Beach`), case-insensitive |
+
+Example: `ALBUM_ID=tag:Family,since:2025-06-01,your_album_id`
+
+Date and tag sources only return images (no videos) and leave out archived and hidden photos. Tag names containing commas are not supported. If your API key has restricted permissions, tag sources need `tag.read`.
 
 ## Management UI
 
