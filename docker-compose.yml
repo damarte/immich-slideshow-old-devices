@@ -17,5 +17,7 @@ services:
       - IMAGES_ORIENTATION=${IMAGES_ORIENTATION:-all}
       - CROP_TO_SCREEN=${CROP_TO_SCREEN:-true}
       - IMAGE_QUALITY=${IMAGE_QUALITY:-preview} # preview (recommended) / fullsize
+      - TRANSITION_SECONDS=${TRANSITION_SECONDS:-1}
+      - SHOW_INFO=${SHOW_INFO:-false}
     volumes:
       - ./public:/var/www/html

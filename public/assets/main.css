@@ -152,3 +152,21 @@ body {
 .album-checkbox:checked + .album-card:hover {
     border-color: #2196f3;
 }
+
+/* Date and albums overlay (bottom-left), enabled with SHOW_INFO=true */
+.photo-info {
+    position: fixed;
+    left: 3%;
+    bottom: 4%;
+    max-width: 70%;
+    z-index: 900;
+    pointer-events: none;
+    color: #fff;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 2px rgba(0, 0, 0, 0.9);
+    opacity: 0;
+}
+.photo-info.visible { opacity: 0.9; }
+.photo-info span { display: block; }
+#photo-date { font-size: 26px; font-weight: 300; }
+#photo-albums { font-size: 15px; margin-top: 4px; opacity: 0.85; }

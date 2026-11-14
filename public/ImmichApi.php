@@ -328,4 +328,51 @@ class ImmichApi {
 
         return [$content_type, $image_data];
     }
+
+    /**
+     * Capture date and album names of one asset, for the photo info overlay
+     *
+     * @param string $asset_id Asset ID
+     * @return array ['date' => string|null, 'albums' => string[]]
+     * @throws Exception If there's an error in the request
+     */
+    public function getAssetInfo(string $asset_id): array {
+        $asset = $this->getJson("/api/assets/" . rawurlencode($asset_id));
+        $albums = $this->getJson("/api/albums?assetId=" . rawurlencode($asset_id));
+
+        $names = [];
+        foreach ($albums as $album) {
+            if (!empty($album['albumName'])) {
+                $names[] = $album['albumName'];
+            }
+        }
+
+        return [
+            // localDateTime is the capture time in the photo's own time zone
+            'date' => $asset['localDateTime'] ?? ($asset['fileCreatedAt'] ?? null),
+            'albums' => $names,
+        ];
+    }
+
+    /**
+     * GET a JSON endpoint of the Immich API
+     */
+    private function getJson(string $path): array {
+        $ch = curl_init($this->immich_url . $path);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "x-api-key: {$this->api_key}",
+            "Accept: application/json"
+        ]);
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($response === false || $http_code !== 200) {
+            $error = "HTTP error $http_code on GET $path";
+            error_log($error);
+            throw new Exception($error);
+        }
+        $data = json_decode($response, true);
+        return is_array($data) ? $data : [];
+    }
 }
