@@ -21,6 +21,8 @@ I searched for projects already created for this purpose and found the great [Im
 
 - Full-screen slideshow of Immich album photos
 - Configurable slide transition time
+- Configurable crossfade length
+- Optional overlay with the photo date and the albums it belongs to
 - Automatic WebP to JPEG conversion for better compatibility
 - Customizable background color
 - Optional random order for photos
@@ -68,6 +70,8 @@ STATUS_BAR_STYLE=black-translucent
 IMAGES_ORIENTATION=all
 CROP_TO_SCREEN=true
 IMAGE_QUALITY=preview
+TRANSITION_SECONDS=1
+SHOW_INFO=false
 ```
 
 ## Usage
@@ -104,6 +108,8 @@ The application will be available at `http://localhost:8080`
 | IMAGES_ORIENTATION   | Orientation of the images (landscape/portrait/all)   | all               | No       |
 | CROP_TO_SCREEN       | Crop images to fill the screen (true) or fit (false) | true              | No       |
 | IMAGE_QUALITY        | Image size requested from Immich (preview/fullsize). `preview` is server-side resized and recommended; `fullsize` needs much more memory for large photos | preview           | No       |
+| TRANSITION_SECONDS   | Length of the crossfade between photos, in seconds (0.2 to 10). Keep it shorter than CAROUSEL_DURATION | 1                 | No       |
+| SHOW_INFO            | Show the photo date (dd/mm/yyyy) and the albums it belongs to in the bottom-left corner | false             | No       |
 
 ## Management UI
 
@@ -125,6 +131,8 @@ You can override the environment variables using query parameters in the URL:
 - `random`: Override the RANDOM_ORDER (use 'true' or 'false')
 - `status_bar`: Override the STATUS_BAR_STYLE (use 'default', 'black-translucent', or 'black')
 - `orientation`: Override the IMAGES_ORIENTATION (use 'landscape', 'portrait', or 'all')
+- `transition`: Override the TRANSITION_SECONDS
+- `info`: Override the SHOW_INFO (use 'true' or 'false')
 
 Example:
 

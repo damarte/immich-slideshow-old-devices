@@ -21,6 +21,12 @@ $carousel_duration = (int)($_GET['duration'] ?? $configuration->get(Configuratio
 $background = preg_match('/^[a-zA-Z0-9#]+$/', $_GET['background'] ?? '') 
     ? $_GET['background'] 
     : ($configuration->get(Configuration::BACKGROUND_COLOR) ?? '#000000');
+// Crossfade length in seconds, and whether to show the date/albums overlay
+$transition = (float)($_GET['transition'] ?? $configuration->get(Configuration::TRANSITION_SECONDS) ?? 1);
+if ($transition < 0.2 || $transition > 10) {
+    $transition = 1;
+}
+$show_info = filter_var($_GET['info'] ?? $configuration->get(Configuration::SHOW_INFO) ?? 'false', FILTER_VALIDATE_BOOLEAN);
 $random_order = filter_var($_GET['random'] ?? $configuration->get(Configuration::RANDOM_ORDER) ?? 'false', FILTER_VALIDATE_BOOLEAN);
 $status_bar_style = in_array($_GET['status_bar'] ?? '', ['default', 'black-translucent', 'black']) 
     ? $_GET['status_bar'] 
@@ -109,6 +115,14 @@ try {
         html, body {
             background-color: <?php echo htmlspecialchars($background); ?>;
         }
+        .carousel img {
+            -webkit-transition: opacity <?php echo $transition; ?>s ease-in-out;
+            transition: opacity <?php echo $transition; ?>s ease-in-out;
+        }
+        .photo-info {
+            -webkit-transition: opacity <?php echo min($transition, 1.5); ?>s ease-in-out;
+            transition: opacity <?php echo min($transition, 1.5); ?>s ease-in-out;
+        }
     </style>
 </head>
 <body>
@@ -119,10 +133,13 @@ try {
         </a>
     </div>
     <img src="assets/pause.png" alt="Pause icon" class="pause-icon" id="pause-icon"/>
+    <div class="photo-info" id="photo-info"><span id="photo-date"></span><span id="photo-albums"></span></div>
     <script>
         initSlideshow({
             photos: <?php echo json_encode($photos); ?>,
-            duration: <?php echo $carousel_duration; ?>
+            duration: <?php echo $carousel_duration; ?>,
+            transition: <?php echo $transition; ?>,
+            showInfo: <?php echo $show_info ? 'true' : 'false'; ?>
         });
 
         document.onkeydown = function(e) {

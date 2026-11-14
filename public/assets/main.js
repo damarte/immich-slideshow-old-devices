@@ -12,6 +12,9 @@ var screenWidth;
 var screenHeight;
 var currentIndex = 0;
 var isTransitioning = false;
+var transitionMs = 1000;
+var showInfo = false;
+var infoCache = {};
 
 /**
  * Initializes the slideshow
@@ -27,6 +30,8 @@ function initSlideshow(config) {
     photos = config.photos;
     totalPhotos = photos.length;
     duration = config.duration * 1000;
+    if (config.transition) transitionMs = config.transition * 1000;
+    showInfo = !!config.showInfo;
     
     // Initial dimensions
     updateScreenDimensions();
@@ -36,6 +41,7 @@ function initSlideshow(config) {
         // Show first image
         currentImg.src = buildProxyUrl(photos[0].id);
         currentImg.className = 'active';
+        showPhotoInfo(photos[0].id);
         currentImg.addEventListener("error", function () {
             this.src = '/assets/apple-icon-180.png';
         });
@@ -43,6 +49,7 @@ function initSlideshow(config) {
         // Preload second image if available
         if (totalPhotos > 1) {
             nextImg.src = buildProxyUrl(photos[1].id);
+            loadPhotoInfo(photos[1].id);
             nextImg.addEventListener("error", function () {
                 this.src = '/assets/apple-icon-180.png';
             });
@@ -97,6 +104,7 @@ function previousImage() {
 
     currentImg.className = '';
     nextImg.className = 'active';
+    showPhotoInfo(photos[currentIndex].id);
 
     var temp = currentImg;
     currentImg = nextImg;
@@ -105,11 +113,12 @@ function previousImage() {
     setTimeout(function () {
         var nextIndex = (currentIndex + 1) % totalPhotos;
         nextImg.src = buildProxyUrl(photos[nextIndex].id);
+        loadPhotoInfo(photos[nextIndex].id);
         isTransitioning = false;
         
         // Resume the timer so it doesn't get stuck forever
         scheduleNextTransition();
-    }, 1000);
+    }, transitionMs);
 }
 
 /**
@@ -134,6 +143,7 @@ function nextImage() {
     // Swap images
     currentImg.className = '';
     nextImg.className = 'active';
+    showPhotoInfo(photos[currentIndex].id);
 
     // Update references
     var temp = currentImg;
@@ -144,11 +154,57 @@ function nextImage() {
     setTimeout(function () {
         var nextIndex = (currentIndex + 1) % totalPhotos;
         nextImg.src = buildProxyUrl(photos[nextIndex].id);
+        loadPhotoInfo(photos[nextIndex].id);
         isTransitioning = false;
-    }, 1000);
+    }, transitionMs);
     
     // Schedule next transition
     scheduleNextTransition();
+}
+
+/**
+ * Fetches date/albums of a photo (cached), then calls back
+ */
+function loadPhotoInfo(assetId, callback) {
+    if (!showInfo) return;
+    if (infoCache[assetId]) {
+        if (callback) callback(infoCache[assetId]);
+        return;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/info.php?asset=' + encodeURIComponent(assetId), true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState !== 4) return;
+        var data = null;
+        if (xhr.status === 200) {
+            try { data = JSON.parse(xhr.responseText); } catch (err) { data = null; }
+        }
+        if (data) infoCache[assetId] = data;
+        if (callback) callback(data);
+    };
+    xhr.send(null);
+}
+
+/**
+ * Fades the overlay out, swaps its text and fades it back in
+ */
+function showPhotoInfo(assetId) {
+    if (!showInfo) return;
+    var box = document.getElementById('photo-info');
+    if (!box) return;
+    box.className = 'photo-info';
+    loadPhotoInfo(assetId, function (data) {
+        // Ignore late answers for a photo that is no longer on screen
+        if (photos[currentIndex].id !== assetId) return;
+        if (!data || (!data.date && !(data.albums && data.albums.length))) return;
+        document.getElementById('photo-date').innerHTML = escapeHtml(data.date || '');
+        document.getElementById('photo-albums').innerHTML = escapeHtml((data.albums || []).join(' \u00b7 '));
+        setTimeout(function () { box.className = 'photo-info visible'; }, transitionMs / 2);
+    });
+}
+
+function escapeHtml(text) {
+    return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 /**
