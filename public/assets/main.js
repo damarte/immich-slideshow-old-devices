@@ -15,6 +15,9 @@ var isTransitioning = false;
 var transitionMs = 1000;
 var showInfo = false;
 var infoCache = {};
+var activeStart = null;
+var activeEnd = null;
+var sleeping = false;
 
 /**
  * Initializes the slideshow
@@ -32,9 +35,22 @@ function initSlideshow(config) {
     duration = config.duration * 1000;
     if (config.transition) transitionMs = config.transition * 1000;
     showInfo = !!config.showInfo;
+    if (typeof config.activeStart === 'number' && typeof config.activeEnd === 'number') {
+        activeStart = config.activeStart;
+        activeEnd = config.activeEnd;
+    }
     
     // Initial dimensions
     updateScreenDimensions();
+
+    // Outside the active hours: black screen, load nothing until they start
+    if (activeStart !== null) {
+        setInterval(checkSchedule, 30000);
+        if (!isWithinActiveHours()) {
+            goToSleep();
+            return;
+        }
+    }
     
     // Initialize slideshow if there are photos
     if (totalPhotos > 0) {
@@ -84,6 +100,7 @@ function buildProxyUrl(assetId) {
  * Loads the next image in the slideshow
  */
 function previousImage() {
+    if (sleeping) return;
     if (totalPhotos === 0 || isTransitioning) return;
     if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
     
@@ -125,6 +142,7 @@ function previousImage() {
  * Loads the next image in the slideshow
  */
 function nextImage() {
+    if (sleeping) return;
     if (totalPhotos === 0 || isTransitioning ) return;
     
     if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
@@ -208,10 +226,48 @@ function escapeHtml(text) {
 }
 
 /**
+ * True when the device clock is inside the configured active hours
+ */
+function isWithinActiveHours() {
+    if (activeStart === null) return true;
+    var now = new Date();
+    var minutes = now.getHours() * 60 + now.getMinutes();
+    if (activeStart < activeEnd) {
+        return minutes >= activeStart && minutes < activeEnd;
+    }
+    // Range crosses midnight, e.g. 18:00-02:00
+    return minutes >= activeStart || minutes < activeEnd;
+}
+
+/**
+ * Called every 30s when ACTIVE_HOURS is set
+ */
+function checkSchedule() {
+    var active = isWithinActiveHours();
+    if (!active && !sleeping) {
+        goToSleep();
+    } else if (active && sleeping) {
+        // Reload to start fresh and pick up photos added overnight
+        window.location.reload();
+    }
+}
+
+function goToSleep() {
+    sleeping = true;
+    if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
+    document.getElementById('sleep-screen').className = 'sleep-screen visible';
+    // Stop showing (and fetching) photos while asleep
+    if (currentImg) currentImg.removeAttribute('src');
+    if (nextImg) nextImg.removeAttribute('src');
+    var info = document.getElementById('photo-info');
+    if (info) info.className = 'photo-info';
+}
+
+/**
  * Schedules the next transition
  */
 function scheduleNextTransition() {
-    if (!isPaused) {
+    if (!isPaused && !sleeping) {
         timeoutId = setTimeout(nextImage, duration);
     }
 }

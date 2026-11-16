@@ -27,6 +27,20 @@ if ($transition < 0.2 || $transition > 10) {
     $transition = 1;
 }
 $show_info = filter_var($_GET['info'] ?? $configuration->get(Configuration::SHOW_INFO) ?? 'false', FILTER_VALIDATE_BOOLEAN);
+// Hours when photos are shown, e.g. 07:00-23:00 (overnight ranges like 18:00-02:00 work).
+// Outside them the screen stays black. Empty means always on.
+$active_start = null;
+$active_end = null;
+$active_hours = trim($_GET['hours'] ?? $configuration->get(Configuration::ACTIVE_HOURS) ?? '');
+if (preg_match('/^([01]?\d|2[0-3]):([0-5]\d)\s*-\s*([01]?\d|2[0-3]):([0-5]\d)$/', $active_hours, $m)) {
+    $active_start = (int)$m[1] * 60 + (int)$m[2];
+    $active_end = (int)$m[3] * 60 + (int)$m[4];
+    if ($active_start === $active_end) {
+        $active_start = $active_end = null;
+    }
+} elseif ($active_hours !== '') {
+    error_log("Ignoring invalid ACTIVE_HOURS '$active_hours', expected HH:MM-HH:MM");
+}
 $random_order = filter_var($_GET['random'] ?? $configuration->get(Configuration::RANDOM_ORDER) ?? 'false', FILTER_VALIDATE_BOOLEAN);
 $status_bar_style = in_array($_GET['status_bar'] ?? '', ['default', 'black-translucent', 'black']) 
     ? $_GET['status_bar'] 
@@ -154,13 +168,16 @@ try {
         </a>
     </div>
     <img src="assets/pause.png" alt="Pause icon" class="pause-icon" id="pause-icon"/>
+    <div class="sleep-screen" id="sleep-screen"></div>
     <div class="photo-info" id="photo-info"><span id="photo-date"></span><span id="photo-albums"></span></div>
     <script>
         initSlideshow({
             photos: <?php echo json_encode($photos); ?>,
             duration: <?php echo $carousel_duration; ?>,
             transition: <?php echo $transition; ?>,
-            showInfo: <?php echo $show_info ? 'true' : 'false'; ?>
+            showInfo: <?php echo $show_info ? 'true' : 'false'; ?>,
+            activeStart: <?php echo $active_start === null ? 'null' : $active_start; ?>,
+            activeEnd: <?php echo $active_end === null ? 'null' : $active_end; ?>
         });
 
         document.onkeydown = function(e) {
