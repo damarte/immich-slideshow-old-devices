@@ -4,7 +4,7 @@ body {
     background: #121212;
     color: white;
     margin: 0;
-    padding-bottom: 21.5rem;
+    padding-bottom: 31rem; /* room for the fixed footer */
     overflow-y: auto !important;
     height: auto;
 }
@@ -165,4 +165,31 @@ input[type="color"] {
 /* Keep blue border on hover if checked */
 .album-checkbox:checked + .album-card:hover {
     border-color: #2196f3;
+}
+
+/* Free-text sources (since:/range:/tag:) below the album grid */
+.extra-sources {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    margin: 1rem 0;
+}
+
+.extra-sources input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.extra-sources small {
+    color: #888;
+}
+
+input[type="time"] {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+input[type="time"]:disabled {
+    opacity: 0.4;
 }
