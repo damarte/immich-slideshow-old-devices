@@ -23,6 +23,7 @@ I searched for projects already created for this purpose and found the great [Im
 - Configurable slide transition time
 - Configurable crossfade length
 - Optional overlay with the photo date and the albums it belongs to
+- Optional active hours: black screen outside them, like a frame that switches off at night
 - Automatic WebP to JPEG conversion for better compatibility
 - Customizable background color
 - Optional random order for photos
@@ -156,6 +157,7 @@ To update, `git pull` in `/opt/immich-slideshow` and copy `public/` again, keepi
 | IMAGE_QUALITY        | Image size requested from Immich (preview/fullsize). `preview` is server-side resized and recommended; `fullsize` needs much more memory for large photos | preview           | No       |
 | TRANSITION_SECONDS   | Length of the crossfade between photos, in seconds (0.2 to 10). Keep it shorter than CAROUSEL_DURATION | 1                 | No       |
 | SHOW_INFO            | Show the photo date (dd/mm/yyyy) and the albums it belongs to in the bottom-left corner | false             | No       |
+| ACTIVE_HOURS         | Show photos only between these hours (`HH:MM-HH:MM`, device clock). Outside them the screen stays black and nothing is loaded; the page reloads when the period starts. Ranges past midnight work (`18:00-02:00`). Empty means always on | (empty)           | No       |
 
 ## Photo sources
 
@@ -195,6 +197,7 @@ You can override the environment variables using query parameters in the URL:
 - `orientation`: Override the IMAGES_ORIENTATION (use 'landscape', 'portrait', or 'all')
 - `transition`: Override the TRANSITION_SECONDS
 - `info`: Override the SHOW_INFO (use 'true' or 'false')
+- `hours`: Override the ACTIVE_HOURS (e.g. `07:00-23:00`)
 
 Example:
 

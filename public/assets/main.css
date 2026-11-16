@@ -170,3 +170,16 @@ body {
 .photo-info span { display: block; }
 #photo-date { font-size: 26px; font-weight: 300; }
 #photo-albums { font-size: 15px; margin-top: 4px; opacity: 0.85; }
+
+/* Full black screen outside ACTIVE_HOURS */
+.sleep-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #000;
+    z-index: 2000;
+}
+.sleep-screen.visible { display: block; }

@@ -19,5 +19,6 @@ services:
       - IMAGE_QUALITY=${IMAGE_QUALITY:-preview} # preview (recommended) / fullsize
       - TRANSITION_SECONDS=${TRANSITION_SECONDS:-1}
       - SHOW_INFO=${SHOW_INFO:-false}
+      - ACTIVE_HOURS=${ACTIVE_HOURS:-} # e.g. 07:00-23:00, empty = always on
     volumes:
       - ./public:/var/www/html
