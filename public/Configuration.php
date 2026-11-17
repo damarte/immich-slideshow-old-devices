@@ -22,7 +22,8 @@ class Configuration {
     const ACTIVE_HOURS = 'ACTIVE_HOURS';
 
     // Alternative environment variable names, checked when the main one is unset.
-    // README and docker-compose use CSS_BACKGROUND_COLOR, the code uses BACKGROUND_COLOR.
+    // CSS_BACKGROUND_COLOR is accepted as an alias of BACKGROUND_COLOR for
+    // setups that still use the old name.
     private const ENV_ALIASES = [
         self::BACKGROUND_COLOR => 'CSS_BACKGROUND_COLOR',
     ];

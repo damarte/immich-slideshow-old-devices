@@ -41,7 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (!empty($invalid_sources)) {
-            $message = "Error: Invalid value: " . htmlspecialchars(implode(', ', $invalid_sources));
+            $message = "Error: Invalid value: " . htmlspecialchars(implode(', ', $invalid_sources))
+                . ". Expected since:YYYY-MM-DD, range:YYYY-MM-DD..YYYY-MM-DD or tag:Name.";
         } elseif (empty($selected_albums) && empty($extra_sources)) {
             $message = "Error: You must select at least one album or add a source.";
         } else {
@@ -70,10 +71,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 /**
- * since:YYYY-MM-DD, range:YYYY-MM-DD..YYYY-MM-DD or tag:Name
+ * since:YYYY-MM-DD, range:YYYY-MM-DD..YYYY-MM-DD or tag:Name.
+ * Dates must be real calendar dates, not just the right shape.
  */
 function isExtraSource(string $source): bool {
-    return (bool)preg_match('/^(since:\d{4}-\d{2}-\d{2}|range:\d{4}-\d{2}-\d{2}\.\.\d{4}-\d{2}-\d{2}|tag:.+)$/', $source);
+    if (preg_match('/^since:(\d{4})-(\d{2})-(\d{2})$/', $source, $m)) {
+        return checkdate((int)$m[2], (int)$m[3], (int)$m[1]);
+    }
+    if (preg_match('/^range:(\d{4})-(\d{2})-(\d{2})\.\.(\d{4})-(\d{2})-(\d{2})$/', $source, $m)) {
+        return checkdate((int)$m[2], (int)$m[3], (int)$m[1])
+            && checkdate((int)$m[5], (int)$m[6], (int)$m[4]);
+    }
+    return (bool)preg_match('/^tag:.+$/', $source);
 }
 
 $configuration = new Configuration();

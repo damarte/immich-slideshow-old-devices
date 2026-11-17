@@ -157,7 +157,7 @@ To update, `git pull` in `/opt/immich-slideshow` and copy `public/` again, keepi
 | IMAGE_QUALITY        | Image size requested from Immich (preview/fullsize). `preview` is server-side resized and recommended; `fullsize` needs much more memory for large photos | preview           | No       |
 | TRANSITION_SECONDS   | Length of the crossfade between photos, in seconds (0.2 to 10). Keep it shorter than CAROUSEL_DURATION | 1                 | No       |
 | SHOW_INFO            | Show the photo date (dd/mm/yyyy) and the albums it belongs to in the bottom-left corner | false             | No       |
-| ACTIVE_HOURS         | Show photos only between these hours (`HH:MM-HH:MM`, device clock). Outside them the screen stays black and nothing is loaded; the page reloads when the period starts. Ranges past midnight work (`18:00-02:00`). Empty means always on | (empty)           | No       |
+| ACTIVE_HOURS         | Show photos only between these hours (`HH:MM-HH:MM`, device clock). Outside them the screen stays black and nothing is loaded; the page reloads when the period starts. Ranges past midnight work (`18:00-02:00`). Empty means always on. Note: the backlight stays on, a web page can't turn the screen off | (empty)           | No       |
 
 ## Photo sources
 
