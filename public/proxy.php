@@ -87,18 +87,8 @@ try {
     // Create the new image with exact screen dimensions
     $resized = imagecreatetruecolor($screen_width, $screen_height);
 
-    // Background color
-    $hex = ltrim($background, '#');
-
-    if (strlen($hex) == 3) {
-        $r = hexdec(str_repeat(substr($hex, 0, 1), 2));
-        $g = hexdec(str_repeat(substr($hex, 1, 1), 2));
-        $b = hexdec(str_repeat(substr($hex, 2, 1), 2));
-    } else {
-        $r = hexdec(substr($hex, 0, 2));
-        $g = hexdec(substr($hex, 2, 2));
-        $b = hexdec(substr($hex, 4, 2));
-    }
+    // Background color (hex or CSS color name, same values the page accepts)
+    list($r, $g, $b) = parseColor($background);
 
     $background = imagecolorallocate($resized, $r, $g, $b);
     imagefill($resized, 0, 0, $background);
@@ -132,4 +122,37 @@ try {
         http_response_code(500);
     }
     echo "Error: Unable to process image. " . $e->getMessage();
+}
+
+/**
+ * Converts a CSS color (#rgb, #rrggbb or a common color name) to RGB.
+ * Without this, names like "black" were parsed as hex and became green.
+ */
+function parseColor(string $color): array {
+    $names = [
+        'black' => '000000', 'white' => 'ffffff', 'gray' => '808080', 'grey' => '808080',
+        'silver' => 'c0c0c0', 'darkgray' => 'a9a9a9', 'darkgrey' => 'a9a9a9',
+        'dimgray' => '696969', 'dimgrey' => '696969', 'lightgray' => 'd3d3d3',
+        'lightgrey' => 'd3d3d3', 'gainsboro' => 'dcdcdc', 'whitesmoke' => 'f5f5f5',
+        'red' => 'ff0000', 'maroon' => '800000', 'green' => '008000', 'lime' => '00ff00',
+        'olive' => '808000', 'yellow' => 'ffff00', 'navy' => '000080', 'blue' => '0000ff',
+        'teal' => '008080', 'aqua' => '00ffff', 'cyan' => '00ffff', 'purple' => '800080',
+        'fuchsia' => 'ff00ff', 'magenta' => 'ff00ff', 'orange' => 'ffa500',
+        'brown' => 'a52a2a', 'pink' => 'ffc0cb', 'beige' => 'f5f5dc', 'ivory' => 'fffff0',
+        'midnightblue' => '191970', 'darkslategray' => '2f4f4f', 'darkslategrey' => '2f4f4f',
+    ];
+
+    $value = strtolower(trim($color));
+    if (isset($names[$value])) {
+        $hex = $names[$value];
+    } elseif (preg_match('/^#?([0-9a-f]{3}|[0-9a-f]{6})$/', $value, $m)) {
+        $hex = strlen($m[1]) === 3
+            ? $m[1][0] . $m[1][0] . $m[1][1] . $m[1][1] . $m[1][2] . $m[1][2]
+            : $m[1];
+    } else {
+        error_log("Unknown background color '$color', using black");
+        $hex = '000000';
+    }
+
+    return [hexdec(substr($hex, 0, 2)), hexdec(substr($hex, 2, 2)), hexdec(substr($hex, 4, 2))];
 }
