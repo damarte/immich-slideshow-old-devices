@@ -4,6 +4,9 @@
  * Immich API Client
  */
 class ImmichApi {
+    const CONNECT_TIMEOUT = 10;
+    const OPERATION_TIMEOUT = 30;
+
     private string $immich_url;
     private string $api_key;
 
@@ -20,6 +23,27 @@ class ImmichApi {
     }
 
     /**
+     * Apply common cURL options to a handle.
+     *
+     * @param resource $ch cURL handle
+     * @param array $extraOptions Additional options to merge (cURL constants as keys)
+     * @return resource The cURL handle
+     */
+    private function applyCurlOptions($ch, array $extraOptions = []): mixed {
+        $baseOptions = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => self::CONNECT_TIMEOUT,
+            CURLOPT_TIMEOUT => self::OPERATION_TIMEOUT,
+            CURLOPT_HTTPHEADER => [
+                "x-api-key: {$this->api_key}",
+                "Accept: application/json"
+            ]
+        ];
+        curl_setopt_array($ch, $baseOptions + $extraOptions);
+        return $ch;
+    }
+
+    /**
      * Get albums
      * 
      * @return array List of albums
@@ -27,13 +51,7 @@ class ImmichApi {
      */
     public function getAlbums(): array {
         $url = "{$this->immich_url}/api/albums";
-        $ch = curl_init($url);
-        
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "x-api-key: {$this->api_key}",
-            "Accept: application/json"
-        ]);
+        $ch = $this->applyCurlOptions(curl_init($url));
 
         $response = curl_exec($ch);
         if ($response === false) {
@@ -192,14 +210,9 @@ class ImmichApi {
                 'page' => $page,
             ]);
 
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                "x-api-key: {$this->api_key}",
-                "Accept: application/json",
-                "Content-Type: application/json"
+            $ch = $this->applyCurlOptions(curl_init($url), [
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $body,
             ]);
 
             $response = curl_exec($ch);
@@ -272,18 +285,8 @@ class ImmichApi {
 
         $url = "{$this->immich_url}/api/assets/{$asset_id}/thumbnail?size={$size}";
 
-        $ch = curl_init($url);
-        if ($ch === false) {
-            throw new Exception('Could not initialize cURL');
-        }
-
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
+        $ch = $this->applyCurlOptions(curl_init($url), [
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTPHEADER => [
-                "x-api-key: {$this->api_key}",
-                "Accept: application/octet-stream"
-            ]
         ]);
 
         $image_data = curl_exec($ch);
