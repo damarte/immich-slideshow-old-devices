@@ -17,6 +17,8 @@ class Configuration {
     const ORIENTATION = 'IMAGES_ORIENTATION';
     const BACKGROUND_COLOR = 'BACKGROUND_COLOR';
     const STATUS_BAR_STYLE = 'STATUS_BAR_STYLE';
+    const TRANSITION_SECONDS = 'TRANSITION_SECONDS';
+    const SHOW_INFO = 'SHOW_INFO';
 
     // Alternative environment variable names, checked when the main one is unset.
     // README and docker-compose use CSS_BACKGROUND_COLOR, the code uses BACKGROUND_COLOR.
