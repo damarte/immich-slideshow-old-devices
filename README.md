@@ -1,7 +1,7 @@
 # Immich Slideshow for old Devices with Management UI
 
 > [!IMPORTANT]
-> For versions of Immich prior to 3.x, use version 1.x of Immich Slideshow for old Devices.
+> For versions of Immich prior to 3.x, use version 1.x of Immich Slideshow for old Devices. Immich v3 support fixed by [@dhruvb14](https://github.com/dhruvb14).
 
 I added some stuff to this repo in order to get it working with the Fully Kiosk Browser on a Nixplay w10a. Generally this should work on tablets with android 19 (4.4). The main slideshow is is at the root URL while the management is done at /management.php. The tablet itself is running fully kiosk's browser, and Tasker to reboot the browser upon reboot/crash.
 
@@ -21,18 +21,19 @@ I searched for projects already created for this purpose and found the great [Im
 
 - Full-screen slideshow of Immich album photos
 - Configurable slide transition time
-- Configurable crossfade length
-- Optional overlay with the photo date and the albums it belongs to
-- Optional active hours: black screen outside them, like a frame that switches off at night
+- Configurable crossfade length [@FernandoJungblut](https://github.com/FernandoJungblut)
+- Optional overlay with the photo date and the albums it belongs to [@FernandoJungblut](https://github.com/FernandoJungblut)
+- Optional active hours: black screen outside them, like a frame that switches off at night [@FernandoJungblut](https://github.com/FernandoJungblut)
 - Automatic WebP to JPEG conversion for better compatibility
-- Customizable background color
+- Customizable background color, as hex value or color name [@FernandoJungblut](https://github.com/FernandoJungblut)
 - Optional random order for photos
 - Configurable status bar style for iOS devices
 - Automatic page reload after showing all photos
 - Built-in image caching for better performance
 - Filter images by orientation (landscape/portrait/all)
 - Use your Immich favorites as a source, alone or combined with albums
-- Use photos taken since a date, within a date range, or with an Immich tag as a source
+- Use photos taken since a date, within a date range, or with an Immich tag as a source [@FernandoJungblut](https://github.com/FernandoJungblut)
+- Run without Docker, on a Linux host, LXC container or VM [@FernandoJungblut](https://github.com/FernandoJungblut)
 - Pause/resume slide
 - Management UI [@JosephAntony1](https://github.com/JosephAntony1)
 - Remote control support [@JosephAntony1](https://github.com/JosephAntony1)
