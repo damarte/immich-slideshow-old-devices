@@ -54,9 +54,20 @@ try {
         if (empty($id)) continue;
         
         try {
-            $album_photos = ($id === Configuration::FAVORITES_ID)
-                ? $api->getFavoriteAssets()
-                : $api->getAlbumAssets($id);
+            if ($id === Configuration::FAVORITES_ID) {
+                $album_photos = $api->getFavoriteAssets();
+            } elseif (preg_match('/^since:(\d{4}-\d{2}-\d{2})$/', $id, $m)) {
+                // since:2024-01-01 -> photos taken on or after that date
+                $album_photos = $api->getAssetsByDate($m[1], null);
+            } elseif (preg_match('/^range:(\d{4}-\d{2}-\d{2})\.\.(\d{4}-\d{2}-\d{2})$/', $id, $m)) {
+                // range:2024-01-01..2024-12-31 -> photos taken within the range
+                $album_photos = $api->getAssetsByDate($m[1], $m[2]);
+            } elseif (strpos($id, 'tag:') === 0) {
+                // tag:Family or tag:Trips/Beach -> photos with that tag
+                $album_photos = $api->getAssetsByTag(substr($id, 4));
+            } else {
+                $album_photos = $api->getAlbumAssets($id);
+            }
             $photos = array_merge($photos, $album_photos);
         } catch (Exception $e) {
             // Log error but continue with other albums
@@ -64,6 +75,16 @@ try {
         }
     }
     
+    // Sources can overlap (e.g. an album and a date range): keep each photo once
+    $seen = [];
+    $photos = array_values(array_filter($photos, function ($photo) use (&$seen) {
+        if (isset($seen[$photo['id']])) {
+            return false;
+        }
+        $seen[$photo['id']] = true;
+        return true;
+    }));
+
     if (empty($photos)) {
         throw new Exception("No photos found in the specified album(s)");
     }
